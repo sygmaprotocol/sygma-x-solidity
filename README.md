@@ -1,47 +1,66 @@
-<p align="center"><a href="https://buildwithsygma.com"><img width="250" title="Sygma solidity" src='assets/full-logo.png'/></a></p>
+## Foundry
 
-# sygma-solidity
+**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
 
-Sygma uses Solidity smart contracts to enable transfers to and from EVM compatible chains. These contracts consist of a core bridge contract (Bridge.sol) and a set of handler contracts (ERC20Handler.sol, ERC721Handler.sol, PermissionedGenericHandler.sol, PermissionlessGenericHandler.sol). The bridge contract is responsible for initiating and executing proposed transfers. The handlers are used by the bridge contract to interact with other existing contracts.
+Foundry consists of:
 
-## Deployments
+-   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
+-   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
+-   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
+-   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
 
-To deploy contracts run `truffle migrate --network NETWORK_NAME --file <path_to_env_config>`.
+## Documentation
 
-For more details on specific flags that can be used and format of environemnt configuration check out [migrations documentation page](/docs/migrations.md).
+https://book.getfoundry.sh/
 
-To add another network do the following:
- * update `truffle-config.js` with the desired configuration
- * add the required params to config file for the desired environment (local,dev,testnet,mainnet)
- * create a deploy script in `migrations` directory
+## Usage
 
-## Dependencies
+### Build
 
-Requires `nodejs` and `npm`.
+```shell
+$ forge build
+```
 
-## Commands
+### Test
 
-`make install-deps`: Installs truffle and ganache globally, fetches local dependencies. Also installs `abigen` from `go-ethereum`.
+```shell
+$ yarn run test
+```
 
-`make bindings`: Creates go bindings in `./build/bindings/go`
+### Format
 
-`PORT=<port> SILENT=<bool> make start-ganache`: Starts a ganache instance, default `PORT=8545 SILENT=false`
+```shell
+$ forge fmt
+```
 
-`QUIET=<bool> make start-geth`: Starts a geth instance with test keys
+### Gas Snapshots
 
-`PORT=<port> make deploy`: Deploys all contract instances, default `PORT=8545`
+```shell
+$ forge snapshot
+```
 
-`make test`: Runs truffle tests.
+### Anvil
 
-`make compile`: Compile contracts.
+```shell
+$ anvil
+```
 
-# Sygma Security Policy
+### Deploy
 
-## Reporting a Security Bug
+```shell
+$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
+```
 
-We take all security issues seriously, if you believe you have found a security issue within a Sygma
-project please notify us immediately. If an issue is confirmed, we will take all necessary precautions
-to ensure a statement and patch release is made in a timely manner.
+### Cast
 
-Please email us a description of the flaw and any related information (e.g. reproduction steps, version) to
-[dev@buildwithsygma.com](mailto:dev@buildwithsygma.com).
+```shell
+$ cast <subcommand>
+```
+
+### Help
+
+```shell
+$ forge --help
+$ anvil --help
+$ cast --help
+```

@@ -1,0 +1,11 @@
+[profile.default]
+src = 'src/contracts'
+out = 'artifactsFoundry'
+libs = ['node_modules', 'lib']
+test = 'test'
+cache_path  = 'forge-cache'
+
+# See more config options https://book.getfoundry.sh/reference/config.html
+
+
+# See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

@@ -1,15 +1,35 @@
-.idea/
-/build
-.history/
-node_modules/
-gethdata/
-gethdata2/
-coverage/
-coverage.json
-src/ethers
-src/web3
-ganache-cli/
-dist/
-data/
-.vscode/
+# Compiler files
+cache/
+out/
+
+# Ignores development broadcast logs
+!/broadcast
+/broadcast/*/31337/
+/broadcast/**/dry-run/
+
+# Docs
+docs/
+
+# Dotenv file
 .env
+
+node_modules
+.env
+coverage
+coverage.json
+typechain
+typechain-types
+
+# Hardhat files
+cache
+cache_hardhat
+artifacts
+typechain-types
+
+# IDE
+.history
+
+# foundry
+lib
+forge-cache
+artifactsFoundry
