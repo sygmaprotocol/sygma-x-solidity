@@ -1,66 +1,46 @@
-## Foundry
+<p align="center"><a href="https://buildwithsygma.com"><img width="250" title="Sygma solidity" src='assets/full-logo.png'/></a></p>
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+# sygma-x-solidity
 
-Foundry consists of:
+Sygma uses Solidity smart contracts to enable transfers to and from EVM compatible chains. These contracts consist of a core bridge contract (Bridge.sol) and a set of handler contracts (ERC20Handler.sol, PermissionlessGenericHandler.sol). The bridge contract is responsible for initiating and executing proposed transfers. The handlers are used by the bridge contract to interact with other existing contracts.
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+## Deployments
 
-## Documentation
+To deploy contracts run `npx hardhat run --network NETWORK_NAME scripts/deploy.ts`.
 
-https://book.getfoundry.sh/
+For more details check out the [official hardhat documentation](https://hardhat.org/hardhat-runner/docs/guides/deploying).
 
-## Usage
+To add another network do the following:
+ * update `hardhat.config.ts` with the desired configuration
 
-### Build
+## Dependencies
 
-```shell
-$ forge build
-```
+Requires `foundry` and `yarn`.
 
-### Test
+## Commands
+  * hardhat commands: <br>
+    `check` - Check whatever you need <br>
+    `clean` - Clears the cache and deletes all artifacts <br>
+    `compile` - Compiles the entire project, building all artifacts <br>
+    `console` - Opens a hardhat console <br>
+    `coverage` - Generates a code coverage report for tests <br>
+    `flatten` - Flattens and prints contracts and their dependencies <br>
+    `help` - Prints this message <br>
+    `node` - Starts a JSON-RPC server on top of Hardhat Network <br>
+    `run` - Runs a user-defined script after compiling the project <br>
+    `test` - Runs mocha tests <br>
+    `typechain` - Generate Typechain typings for compiled contracts <br>
+    `verify` - Verifies contract on Etherscan <br>
+  * custom commands: <br>
+    `yarn run test`: Runs truffle tests.
 
-```shell
-$ yarn run test
-```
+# Sygma Security Policy
 
-### Format
+## Reporting a Security Bug
 
-```shell
-$ forge fmt
-```
+We take all security issues seriously, if you believe you have found a security issue within a Sygma
+project please notify us immediately. If an issue is confirmed, we will take all necessary precautions
+to ensure a statement and patch release is made in a timely manner.
 
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
-```
+Please email us a description of the flaw and any related information (e.g. reproduction steps, version) to
+[dev@buildwithsygma.com](mailto:dev@buildwithsygma.com).
