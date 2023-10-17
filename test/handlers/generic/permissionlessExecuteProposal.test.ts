@@ -27,7 +27,7 @@ describe("PermissionlessGenericHandler - [Execute Proposal]", () => {
   const expectedDepositNonce = 1;
 
   const feeData = "0x";
-  const destinationMaxFee = BigInt(2000000);
+  const destinationMaxFee = BigInt(900000);
   const hashOfTestStore = ethers.keccak256("0xc0ffee");
   const handlerResponseLength = 64;
   const contractCallReturndata = ethers.ZeroHash;
@@ -43,6 +43,7 @@ describe("PermissionlessGenericHandler - [Execute Proposal]", () => {
   let resourceID: string;
   let depositFunctionSignature: string;
   let depositData: string;
+  let depositDataHash: string;
   let proposal: {
     originDomainID: number;
     depositNonce: number;
@@ -94,7 +95,10 @@ describe("PermissionlessGenericHandler - [Execute Proposal]", () => {
       await depositorAccount.getAddress(),
       hashOfTestStore,
     );
-
+    depositDataHash = ethers.keccak256(
+      (await permissionlessGenericHandlerInstance.getAddress()) +
+        depositData.substring(2),
+    );
     proposal = {
       originDomainID: originDomainID,
       depositNonce: expectedDepositNonce,
@@ -151,11 +155,6 @@ describe("PermissionlessGenericHandler - [Execute Proposal]", () => {
       hashOfTestStore,
     );
 
-    const depositDataHash = ethers.keccak256(
-      (await permissionlessGenericHandlerInstance.getAddress()) +
-        depositData.substring(2),
-    );
-
     await expect(
       bridgeInstance
         .connect(depositorAccount)
@@ -190,6 +189,67 @@ describe("PermissionlessGenericHandler - [Execute Proposal]", () => {
 
     // Check that asset isn't marked as stored in testStoreInstance
     assert.isTrue(await testStoreInstance._assetsStored(hashOfTestStore));
+  });
+
+  it("ProposalExecution should be emitted even if gas specified too small", async () => {
+    const num = 6;
+    const addresses = [
+      await bridgeInstance.getAddress(),
+      await testStoreInstance.getAddress(),
+    ];
+    const message = ethers.encodeBytes32String("message");
+    const executionData = ethers.AbiCoder.defaultAbiCoder().encode(
+      ["uint", "address[]", "bytes"],
+      [num, addresses, message],
+    );
+
+    // If the target function accepts (address depositor, bytes executionData)
+    // then this helper can be used
+    const preparedExecutionData =
+      await testDepositInstance.prepareDepositData(executionData);
+    const depositFunctionSignature =
+      testDepositInstance.interface.getFunction("executePacked").selector;
+    const tooSmallGas = 500;
+
+    const depositData = createPermissionlessGenericDepositData(
+      depositFunctionSignature,
+      await testDepositInstance.getAddress(),
+      tooSmallGas,
+      await depositorAccount.getAddress(),
+      preparedExecutionData,
+    );
+
+    const proposal = {
+      originDomainID: originDomainID,
+      depositNonce: expectedDepositNonce,
+      data: depositData,
+      resourceID: resourceID,
+    };
+    await expect(
+      bridgeInstance
+        .connect(depositorAccount)
+        .deposit(originDomainID, resourceID, depositData, feeData),
+    ).not.to.be.reverted;
+
+    // relayerAccount executes the proposal
+    const executeTx = await bridgeInstance
+      .connect(depositorAccount)
+      .executeProposal(proposal);
+
+    // check that ProposalExecution event is emitted
+    await expect(executeTx)
+      .to.emit(bridgeInstance, "ProposalExecution")
+      .withArgs(
+        originDomainID,
+        expectedDepositNonce,
+        hashMessage,
+        ethers.AbiCoder.defaultAbiCoder().encode(
+          ["bool", "uint256", "bytes32"],
+          [false, handlerResponseLength, contractCallReturndata],
+        ),
+      );
+
+    await expect(executeTx).not.to.emit(testDepositInstance, "TestExecute");
   });
 
   it("call with packed depositData should be successful", async () => {

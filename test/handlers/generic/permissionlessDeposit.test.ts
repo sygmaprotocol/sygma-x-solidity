@@ -21,7 +21,7 @@ describe("PermissionlessGenericHandler - [deposit]", () => {
   const expectedDepositNonce = 1;
 
   const feeData = "0x";
-  const destinationMaxFee = BigInt("2000000");
+  const destinationMaxFee = BigInt("900000");
   const hashOfTestStore = ethers.keccak256("0xc0ffee");
   const emptySetResourceData = "0x";
 
@@ -122,5 +122,24 @@ describe("PermissionlessGenericHandler - [deposit]", () => {
         .connect(depositorAccount)
         .deposit(destinationDomainID, resourceID, invalidDepositData, feeData),
     ).to.be.revertedWith("incorrect depositor in deposit data");
+  });
+
+  it("should revert if max fee exceeds 1000000", async () => {
+    const invalidMaxFee = BigInt(1000001);
+    const invalidDepositData = createPermissionlessGenericDepositData(
+      depositFunctionSignature,
+      await testStoreInstance.getAddress(),
+      invalidMaxFee,
+      await depositorAccount.getAddress(),
+      hashOfTestStore,
+    );
+
+    await expect(
+      bridgeInstance
+        .connect(depositorAccount)
+        .deposit(destinationDomainID, resourceID, invalidDepositData, feeData, {
+          from: depositorAccount,
+        }),
+    ).to.be.revertedWith("requested fee too large");
   });
 });
