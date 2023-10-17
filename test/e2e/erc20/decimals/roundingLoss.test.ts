@@ -287,7 +287,8 @@ describe("E2E ERC20 - Two EVM Chains both with decimal places != 18 with roundin
         originDomainID,
         destinationResourceID,
         expectedDepositNonce,
-        destinationDepositData,
+        await recipientAccount.getAddress(),
+        destinationDepositData.toLowerCase(),
         toHex(destinationRelayerConvertedAmount.toString(), 32),
       );
 

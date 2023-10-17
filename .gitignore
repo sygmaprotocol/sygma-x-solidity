@@ -30,6 +30,5 @@ typechain-types
 .history
 
 # foundry
-lib
 forge-cache
 artifactsFoundry
