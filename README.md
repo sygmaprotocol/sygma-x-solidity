@@ -15,7 +15,7 @@ To add another network do the following:
 
 ## Dependencies
 
-Requires `foundry` and `yarn`.
+Requires `yarn` and `@nomicfoundation/hardhat`.
 
 ## Commands
   * hardhat commands: <br>

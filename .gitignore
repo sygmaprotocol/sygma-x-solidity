@@ -22,13 +22,8 @@ typechain-types
 
 # Hardhat files
 cache
-cache_hardhat
 artifacts
 typechain-types
 
 # IDE
 .history
-
-# foundry
-forge-cache
-artifactsFoundry

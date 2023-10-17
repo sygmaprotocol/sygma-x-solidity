@@ -2,8 +2,6 @@ import {HardhatUserConfig} from "hardhat/config";
 import "hardhat-preprocessor";
 import "@nomicfoundation/hardhat-toolbox";
 import "@nomicfoundation/hardhat-chai-matchers";
-import "@nomicfoundation/hardhat-foundry";
-import {getRemappings} from "./scripts/utils";
 
 
 const config: HardhatUserConfig = {
@@ -16,21 +14,6 @@ const config: HardhatUserConfig = {
         runs: 200
       }
     }
-  },
-  preprocess: {
-    eachLine: (hre) => ({
-      transform: (line: string) => {
-        if (line.match(/^\s*import /i)) {
-          for (const [from, to] of getRemappings()) {
-            if (line.includes(from)) {
-              line = line.replace(from, to);
-              break;
-            }
-          }
-        }
-        return line;
-      },
-    }),
   },
   paths: {
     sources: "./src/contracts",

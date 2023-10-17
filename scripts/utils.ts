@@ -1,28 +1,33 @@
 import fs from "fs";
 import { resolve } from "path";
-import { keccak256 } from "ethers";
+import type { InterfaceAbi, Fragment } from "ethers";
+import { keccak256, ContractFactory } from "ethers";
 
 const BRIDGE_CONTRACT_PATH = resolve(__dirname, "../src/contracts/Bridge.sol");
 const ARTIFACTS_PATH = resolve(
   __dirname,
-  "../artifactsFoundry/Bridge.sol/Bridge.json",
+  "../artifacts/src/contracts/Bridge.sol/Bridge.json",
 );
-
-export function getRemappings(): string[][] {
-  return fs
-    .readFileSync("remappings.txt", "utf8")
-    .split("\n")
-    .filter(Boolean) // remove empty lines
-    .map((line) => line.trim().split("="));
-}
 
 export function generateAccessControlFuncSignatures(): {
   function: string;
   hash: string;
 }[] {
-  const bridgeAbiJson = JSON.parse(fs.readFileSync(ARTIFACTS_PATH).toString());
-  const bridgeContractMethods = bridgeAbiJson.metadata.output.userdoc
-    .methods as { [key: string]: string };
+  const bridgeArtifacts = JSON.parse(
+    fs.readFileSync(ARTIFACTS_PATH).toString(),
+  );
+  const bridgeContractFactory = new ContractFactory(
+    bridgeArtifacts.abi as InterfaceAbi,
+    bridgeArtifacts.bytecode as string,
+  );
+  const bridgeContractMethods = bridgeContractFactory.interface.fragments
+    .map((fragment: Fragment) => {
+      if (fragment.type == "function") {
+        return fragment.format();
+      }
+    })
+    .filter((item) => item) as Array<string>;
+
   const bridgeContract = fs.readFileSync(BRIDGE_CONTRACT_PATH);
 
   // regex that will match all functions that have "onlyAllowed" modifier
@@ -41,7 +46,7 @@ export function generateAccessControlFuncSignatures(): {
 
   let accessControlFuncSignatures = [];
   // filter out from Bridge ABI functions signatures with "onlyAllowed" modifier
-  accessControlFuncSignatures = Object.keys(bridgeContractMethods)
+  accessControlFuncSignatures = bridgeContractMethods
     .filter((el1) => b.some((el2) => el1.includes(el2)))
     .map((func) => ({
       function: func,
