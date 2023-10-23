@@ -38,26 +38,42 @@ contract PermissionlessGenericHandler is IHandler {
      */
     function setResource(bytes32 resourceID, address contractAddress, bytes calldata args) external onlyBridge {}
 
-    /* solhint-disable max-line-length */
     /**
         @notice A deposit is initiated by making a deposit in the Bridge contract.
         @param resourceID ResourceID used to find address of contract to be used for deposit.
         @param depositor Address of the account making deposit in the Bridge contract.
         @param data Structure should be constructed as follows:
-          maxFee:                       uint256  bytes  0                                                                                           -  32
-          len(executeFuncSignature):    uint16   bytes  32                                                                                          -  34
-          executeFuncSignature:         bytes    bytes  34                                                                                          -  34 + len(executeFuncSignature)
-          len(executeContractAddress):  uint8    bytes  34 + len(executeFuncSignature)                                                              -  35 + len(executeFuncSignature)
-          executeContractAddress        bytes    bytes  35 + len(executeFuncSignature)                                                              -  35 + len(executeFuncSignature) + len(executeContractAddress)
-          len(executionDataDepositor):  uint8    bytes  35 + len(executeFuncSignature) + len(executeContractAddress)                                -  36 + len(executeFuncSignature) + len(executeContractAddress)
-          executionDataDepositor:       bytes    bytes  36 + len(executeFuncSignature) + len(executeContractAddress)                                -  36 + len(executeFuncSignature) + len(executeContractAddress) + len(executionDataDepositor)
-          executionData:                bytes    bytes  36 + len(executeFuncSignature) + len(executeContractAddress) + len(executionDataDepositor)  -  END
+            maxFee: uint256
+                bytes 0 -
+                bytes 32
+            len(executeFuncSignature): uint16
+                bytes 32 -
+                bytes 34
+            executeFuncSignature: bytes
+                bytes 34 -
+                bytes 34 + len(executeFuncSignature)
+            len(executeContractAddress): uint8
+                bytes 34 + len(executeFuncSignature) -
+                bytes 35 + len(executeFuncSignature)
+            executeContractAddress: bytes
+                bytes 35 + len(executeFuncSignature) -
+                bytes 35 + len(executeFuncSignature) + len(executeContractAddress)
+            len(executionDataDepositor): uint8
+                bytes 35 + len(executeFuncSignature) + len(executeContractAddress) -
+                bytes 36 + len(executeFuncSignature) + len(executeContractAddress)
+            executionDataDepositor: bytes
+                bytes 36 + len(executeFuncSignature) + len(executeContractAddress) -
+                bytes 36 + len(executeFuncSignature) + len(executeContractAddress) + len(executionDataDepositor)
+            executionData: bytes
+                bytes 36 + len(executeFuncSignature) + len(executeContractAddress) + len(executionDataDepositor) -
+                END
 
-          executionData is repacked together with executionDataDepositor address for using it in the target contract.
-          If executionData contains dynamic types then it is necessary to keep the offsets correct.
-          executionData should be encoded together with a 32-byte address and then passed as a parameter without that address.
-          If the target function accepts (address depositor, bytes executionData)
-          then a function like the following one can be used:
+            executionData is repacked together with executionDataDepositor address for using it in the target contract.
+            If executionData contains dynamic types then it is necessary to keep the offsets correct.
+            executionData should be encoded together with a 32-byte address and then passed as
+            a parameter without that address.
+            If the target function accepts (address depositor, bytes executionData)
+            then a function like the following one can be used:
 
             function prepareDepositData(bytes calldata executionData) view external returns (bytes memory) {
                 bytes memory encoded = abi.encode(address(0), executionData);
@@ -67,19 +83,19 @@ contract PermissionlessGenericHandler is IHandler {
             function slice(bytes calldata input, uint256 position) pure public returns (bytes memory) {
                 return input[position:];
             }
-          After this, the target contract will get the following:
-          executeFuncSignature(address executionDataDepositor, bytes executionData)
+            After this, the target contract will get the following:
+            executeFuncSignature(address executionDataDepositor, bytes executionData)
 
-          Another example: if the target function accepts (address depositor, uint[], address)
-          then a function like the following one can be used:
+            Another example: if the target function accepts (address depositor, uint[], address)
+            then a function like the following one can be used:
 
             function prepareDepositData(uint[] calldata uintArray, address addr) view external returns (bytes memory) {
                 bytes memory encoded = abi.encode(address(0), uintArray, addr);
                 return this.slice(encoded, 32);
             }
 
-          After this, the target contract will get the following:
-          executeFuncSignature(address executionDataDepositor, uint[] uintArray, address addr)
+            After this, the target contract will get the following:
+            executeFuncSignature(address executionDataDepositor, uint[] uintArray, address addr)
      */
     function deposit(bytes32 resourceID, address depositor, bytes calldata data) external view returns (bytes memory) {
         require(data.length >= 76, "Incorrect data length"); // 32 + 2 + 1 + 1 + 20 + 20
@@ -119,20 +135,37 @@ contract PermissionlessGenericHandler is IHandler {
         @notice Proposal execution should be initiated when a proposal is finalized in the Bridge contract.
         @param resourceID ResourceID used to find address of contract to be used for deposit.
         @param data Structure should be constructed as follows:
-          maxFee:                             uint256  bytes  0                                                             -  32
-          len(executeFuncSignature):          uint16   bytes  32                                                            -  34
-          executeFuncSignature:               bytes    bytes  34                                                            -  34 + len(executeFuncSignature)
-          len(executeContractAddress):        uint8    bytes  34 + len(executeFuncSignature)                                -  35 + len(executeFuncSignature)
-          executeContractAddress              bytes    bytes  35 + len(executeFuncSignature)                                -  35 + len(executeFuncSignature) + len(executeContractAddress)
-          len(executionDataDepositor):        uint8    bytes  35 + len(executeFuncSignature) + len(executeContractAddress)  -  36 + len(executeFuncSignature) + len(executeContractAddress)
-          executionDataDepositor:             bytes    bytes  36 + len(executeFuncSignature) + len(executeContractAddress)                                -  36 + len(executeFuncSignature) + len(executeContractAddress) + len(executionDataDepositor)
-          executionData:                      bytes    bytes  36 + len(executeFuncSignature) + len(executeContractAddress) + len(executionDataDepositor)  -  END
+            maxFee: uint256
+                bytes 0 -
+                bytes 32
+            len(executeFuncSignature): uint16
+                bytes 32 -
+                bytes 34
+            executeFuncSignature: bytes
+                bytes 34 -
+                bytes 34 + len(executeFuncSignature)
+            len(executeContractAddress): uint8
+                bytes 34 + len(executeFuncSignature) -
+                bytes 35 + len(executeFuncSignature)
+            executeContractAddress bytes
+                bytes 35 + len(executeFuncSignature) -
+                bytes 35 + len(executeFuncSignature) + len(executeContractAddress)
+            len(executionDataDepositor): uint8
+                bytes 35 + len(executeFuncSignature) + len(executeContractAddress) -
+                bytes 36 + len(executeFuncSignature) + len(executeContractAddress)
+            executionDataDepositor: bytes
+                bytes 36 + len(executeFuncSignature) + len(executeContractAddress) -
+                bytes 36 + len(executeFuncSignature) + len(executeContractAddress) + len(executionDataDepositor)
+            executionData: bytes
+                bytes 36 + len(executeFuncSignature) + len(executeContractAddress) + len(executionDataDepositor) -
+                END
 
-          executionData is repacked together with executionDataDepositor address for using it in the target contract.
-          If executionData contains dynamic types then it is necessary to keep the offsets correct.
-          executionData should be encoded together with a 32-byte address and then passed as a parameter without that address.
-          If the target function accepts (address depositor, bytes executionData)
-          then a function like the following one can be used:
+            executionData is repacked together with executionDataDepositor address for using it in the target contract.
+            If executionData contains dynamic types then it is necessary to keep the offsets correct.
+            executionData should be encoded together with a 32-byte address and then passed as
+            a parameter without that address.
+            If the target function accepts (address depositor, bytes executionData)
+            then a function like the following one can be used:
 
             function prepareDepositData(bytes calldata executionData) view external returns (bytes memory) {
                 bytes memory encoded = abi.encode(address(0), executionData);
@@ -143,19 +176,19 @@ contract PermissionlessGenericHandler is IHandler {
                 return input[position:];
             }
 
-          After this, the target contract will get the following:
-          executeFuncSignature(address executionDataDepositor, bytes executionData)
+            After this, the target contract will get the following:
+            executeFuncSignature(address executionDataDepositor, bytes executionData)
 
-          Another example: if the target function accepts (address depositor, uint[], address)
-          then a function like the following one can be used:
+            Another example: if the target function accepts (address depositor, uint[], address)
+            then a function like the following one can be used:
 
             function prepareDepositData(uint[] calldata uintArray, address addr) view external returns (bytes memory) {
                 bytes memory encoded = abi.encode(address(0), uintArray, addr);
                 return this.slice(encoded, 32);
             }
 
-          After this, the target contract will get the following:
-          executeFuncSignature(address executionDataDepositor, uint[] uintArray, address addr)
+            After this, the target contract will get the following:
+            executeFuncSignature(address executionDataDepositor, uint[] uintArray, address addr)
      */
     function executeProposal(bytes32 resourceID, bytes calldata data) external onlyBridge returns (bytes memory) {
         uint256 maxFee;
@@ -205,5 +238,4 @@ contract PermissionlessGenericHandler is IHandler {
         (bool success, bytes memory returndata) = executeContractAddress.call{gas: maxFee}(callData);
         return abi.encode(success, returndata);
     }
-    /* solhint-enable max-line-length */
 }
