@@ -24,13 +24,13 @@ contract FeeHandlerRouter is IFeeHandler, AccessControl {
 
     error IncorrectFeeSupplied(uint256);
 
-    modifier onlyBridge() {
-        _onlyBridge();
+    modifier onlyRouter() {
+        _onlyRouter();
         _;
     }
 
-    function _onlyBridge() private view {
-        require(msg.sender == _bridgeAddress, "sender must be bridge contract");
+    function _onlyRouter() private view {
+        require(msg.sender == _bridgeAddress, "sender must be router contract");
     }
 
     modifier onlyAdmin() {
@@ -92,7 +92,7 @@ contract FeeHandlerRouter is IFeeHandler, AccessControl {
         bytes32 resourceID,
         bytes calldata depositData,
         bytes calldata feeData
-    ) external payable onlyBridge {
+    ) external payable onlyRouter {
         if (_whitelist[sender]) {
             if (msg.value != 0) revert IncorrectFeeSupplied(msg.value);
             return;
