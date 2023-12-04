@@ -11,7 +11,7 @@ import "../utils/AccessControl.sol";
     @notice This contract is intended to be used with the Bridge contract.
  */
 contract FeeHandlerRouter is IFeeHandler, AccessControl {
-    address public immutable _bridgeAddress;
+    address public immutable _routerAddress;
 
     // destination domainID => resourceID => feeHandlerAddress
     mapping(uint8 => mapping(bytes32 => IFeeHandler)) public _domainResourceIDToFeeHandlerAddress;
@@ -30,7 +30,7 @@ contract FeeHandlerRouter is IFeeHandler, AccessControl {
     }
 
     function _onlyRouter() private view {
-        require(msg.sender == _bridgeAddress, "sender must be router contract");
+        require(msg.sender == _routerAddress, "sender must be router contract");
     }
 
     modifier onlyAdmin() {
@@ -43,10 +43,10 @@ contract FeeHandlerRouter is IFeeHandler, AccessControl {
     }
 
     /**
-        @param bridgeAddress Contract address of previously deployed Bridge.
+        @param routerAddress Contract address of previously deployed Router.
      */
-    constructor(address bridgeAddress) {
-        _bridgeAddress = bridgeAddress;
+    constructor(address routerAddress) {
+        _routerAddress = routerAddress;
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 

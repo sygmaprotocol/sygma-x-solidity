@@ -34,7 +34,8 @@ contract PermissionlessGenericHandler is IHandler {
     }
 
     /**
-        @param executorAddress Contract address of previously deployed Bridge.
+        @param bridgeAddress Contract address of previously deployed Bridge.
+        @param executorAddress Contract address of previously deployed Executor.
      */
     constructor(address bridgeAddress, address executorAddress) {
         _bridgeAddress = bridgeAddress;
