@@ -22,6 +22,7 @@ contract Router is Context {
 
     IBridge public immutable _bridge;
     IAccessControlSegregator public _accessControl;
+    uint8 public immutable _domainID;
 
     // destinationDomainID => number of deposits
     mapping(uint8 => uint64) public _depositCounts;
@@ -57,6 +58,7 @@ contract Router is Context {
     constructor(address bridge, address accessControl) {
         _bridge = IBridge(bridge);
         _accessControl = IAccessControlSegregator(accessControl);
+        _domainID = IBridge(_bridge)._domainID();
     }
 
     /**
@@ -90,8 +92,7 @@ contract Router is Context {
         bytes calldata depositData,
         bytes calldata feeData
     ) external payable whenBridgeNotPaused returns (uint64 depositNonce, bytes memory handlerResponse) {
-        uint8 domainID = IBridge(_bridge)._domainID();
-        if (destinationDomainID == domainID) revert DepositToCurrentDomain();
+        if (destinationDomainID == _domainID) revert DepositToCurrentDomain();
 
         address sender = _msgSender();
         IFeeHandler feeHandler = _bridge._feeHandler();
@@ -101,7 +102,7 @@ contract Router is Context {
             // Reverts on failure
             feeHandler.collectFee{value: msg.value}(
                 sender,
-                domainID,
+                _domainID,
                 destinationDomainID,
                 resourceID,
                 depositData,
