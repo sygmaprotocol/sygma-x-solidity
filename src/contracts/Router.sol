@@ -79,7 +79,7 @@ contract Router is Context {
         @param resourceID ResourceID used to find address of handler to be used for deposit.
         @param depositData Additional data to be passed to specified handler.
         @param feeData Additional data to be passed to the fee handler.
-        @notice Emits {Deposit} event with all necessary parameters and a handler response.
+        @notice Emits {Deposit} event with all necessary parameters.
         @return depositNonce deposit nonce for the destination domain.
      */
     function deposit(
