@@ -8,7 +8,6 @@ import {
   deployBridgeContracts,
   createResourceID,
   createERCDepositData,
-  createDepositProposalDataFromHandlerResponse,
   toHex,
 } from "../../../helpers";
 import type {
