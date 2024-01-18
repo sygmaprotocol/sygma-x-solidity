@@ -22,7 +22,8 @@ interface ISpectre {
         uint256[12] accumulator;
     }
 
-    /// @notice Verify that a sync committee has attested to a block that finalizes the given header root and execution payload
+    /// @notice Verify that a sync committee has attested to a block that finalizes 
+    /// the given header root and execution payload
     /// @param input The input to the sync step. Defines the slot and attestation to verify
     /// @param proof The proof for the sync step
     function step(SyncStepInput calldata input, bytes calldata proof) external;

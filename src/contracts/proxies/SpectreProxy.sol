@@ -13,13 +13,13 @@ import "../utils/AccessControl.sol";
  */
 contract SpectreProxy is AccessControl {
 
-    uint public constant STATE_ROOT_INDEX = 18;
+    uint8 public constant STATE_ROOT_INDEX = 18;
 
     // source domainID => slot => state root
-    mapping(uint8 => mapping(uint256 => bytes32)) stateRoots;
+    mapping(uint8 => mapping(uint256 => bytes32)) public stateRoots;
 
     // source domainID => spectre contract address
-    mapping(uint8 => address) _spectreContracts;
+    mapping(uint8 => address) public spectreContracts;
 
     event CommitteeRotated(uint8 sourceDomainID, uint256 slot);
     event StateRootSubmitted(uint8 sourceDomainID, uint256 slot, bytes32 stateRoot);
@@ -34,12 +34,27 @@ contract SpectreProxy is AccessControl {
     }
 
     /**
+        @notice Initializes spectre proxy and sets initial
+        spectre addresses.
+        @param domainIDS List of to be domain IDs.
+        @param spectreAddresses List of spectre addresses.
+    */
+    constructor(uint8[] memory domainIDS, address[] memory spectreAddresses) {
+        require(domainIDS.length == spectreAddresses.length, "array length should be equal");
+        for (uint8 i = 0; i < domainIDS.length; i++) {
+            spectreContracts[domainIDS[i]] = spectreAddresses[i];
+        }
+
+        _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+    }
+
+    /**
         @notice Admin function that sets the spectre address for a domain
         @param sourceDomainID Domain ID of the source chain
         @param spectreAddress Address of the contract
      */
     function adminSetSpectreAddress(uint8 sourceDomainID, address spectreAddress) external onlyAdmin {
-        _spectreContracts[sourceDomainID] = spectreAddress;
+        spectreContracts[sourceDomainID] = spectreAddress;
     }
 
     /**
@@ -57,7 +72,7 @@ contract SpectreProxy is AccessControl {
         ISpectre.SyncStepInput calldata stepInput, 
         bytes calldata stepProof
     ) external {
-        address spectreAddress = _spectreContracts[sourceDomainID];
+        address spectreAddress = spectreContracts[sourceDomainID];
         require(spectreAddress != address(0), "no spectre address found");
 
         ISpectre spectre = ISpectre(spectreAddress);
@@ -80,7 +95,7 @@ contract SpectreProxy is AccessControl {
         bytes32 stateRoot,
         bytes[] calldata stateRootProof
     ) external {
-        address spectreAddress = _spectreContracts[sourceDomainID];
+        address spectreAddress = spectreContracts[sourceDomainID];
         require(spectreAddress != address(0), "no spectre address found");
 
         ISpectre spectre = ISpectre(spectreAddress);
@@ -97,7 +112,12 @@ contract SpectreProxy is AccessControl {
 
     }
 
-    function verifyMerkleBranch(bytes32 leaf, bytes32 root, bytes[] calldata proof, uint256 index) internal pure returns (bool) {
+    function verifyMerkleBranch(
+        bytes32 leaf, 
+        bytes32 root, 
+        bytes[] calldata proof, 
+        uint8 index
+    ) internal pure returns (bool) {
         bytes32 value = leaf;
 
         for (uint256 i = 0; i < proof.length; i++) {
