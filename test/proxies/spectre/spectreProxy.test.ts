@@ -1,10 +1,9 @@
 import { assert, expect } from "chai";
 import { ethers } from "hardhat";
 import type { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
-import {} from "../../helpers";
 import type { ISpectre, SpectreProxy } from "../../../typechain-types";
 
-describe("", () => {
+describe("Spectre Proxy", () => {
   const originDomainID = 1;
 
   const invalidOriginDomainID = 4;
