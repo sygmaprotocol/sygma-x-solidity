@@ -135,7 +135,6 @@ export async function deployBridgeContracts(
     await accessControlInstance.getAddress(),
     1,
     await stateRootStorageInstance.getAddress(),
-    2,
   );
   await executorInstance.adminChangeRouter(
     // mock that the origin domain the is different than executor domainID

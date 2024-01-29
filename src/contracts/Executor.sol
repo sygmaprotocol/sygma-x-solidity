@@ -23,7 +23,7 @@ contract Executor is Context {
 
     IBridge public immutable _bridge;
     uint8 public immutable _domainID;
-    uint256 public _slotIndex;
+    uint8 public constant SLOT_INDEX = 2;
     IAccessControlSegregator public _accessControl;
 
     // securityModel => block header storage address
@@ -69,14 +69,12 @@ contract Executor is Context {
         address bridge,
         address accessControl,
         uint8 securityModel,
-        address blockHeaderStorage,
-        uint256 slotIndex
+        address blockHeaderStorage
     ) {
         _bridge = IBridge(bridge);
         _domainID = _bridge._domainID();
         _accessControl = IAccessControlSegregator(accessControl);
         _securityModels[securityModel] = blockHeaderStorage;
-        _slotIndex = slotIndex;
     }
 
     /**
@@ -115,11 +113,11 @@ contract Executor is Context {
             address routerAddress = _originDomainIDToRouter[proposals[i].originDomainID];
 
             IStateRootStorage blockHeaderStorage = IStateRootStorage(_securityModels[proposals[i].securityModel]);
-            stateRoot = IStateRootStorage(blockHeaderStorage).getStateRoots(proposals[i].originDomainID, slot);
+            stateRoot = blockHeaderStorage.getStateRoots(proposals[i].originDomainID, slot);
             storageRoot = StorageProof.getStorageRoot(accountProof, routerAddress, stateRoot);
             address handler = IBridge(_bridge)._resourceIDToHandlerAddress(proposals[i].resourceID);
             IHandler depositHandler = IHandler(handler);
-            require(verify(proposals[i], storageRoot), "failed to verify proposal");
+            verify(proposals[i], storageRoot);
 
             usedNonces[proposals[i].originDomainID][proposals[i].depositNonce / 256] |=
                 1 <<
@@ -186,7 +184,7 @@ contract Executor is Context {
             )
         );
         bytes32 slotKey = keccak256(abi.encode(keccak256(
-            abi.encode(proposal.depositNonce, keccak256(abi.encode(_domainID, _slotIndex)))
+            abi.encode(proposal.depositNonce, keccak256(abi.encode(_domainID, SLOT_INDEX)))
         )));
 
         bytes32 slotValue = StorageProof.getStorageValue(slotKey, storageRoot, proposal.storageProof);
