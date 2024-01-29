@@ -4,7 +4,12 @@
 import { ethers } from "hardhat";
 import type { TransactionReceipt, TransactionResponse } from "ethers";
 import { generateAccessControlFuncSignatures } from "../scripts/utils";
-import type { Bridge, Router, Executor } from "../typechain-types";
+import type {
+  Bridge,
+  Router,
+  Executor,
+  BlockStorage,
+} from "../typechain-types";
 
 export const blankFunctionSig = "0x00000000";
 export const blankFunctionDepositorOffset = "0x0000";
@@ -91,14 +96,15 @@ export function decimalToPaddedBinary(decimal: bigint): string {
 }
 
 // filter out only func signatures
-const contractsToGenerateSignatures = ["Bridge", "Router"];
+const contractsToGenerateSignatures = ["Bridge", "Router", "Executor"];
 export const accessControlFuncSignatures = generateAccessControlFuncSignatures(
   contractsToGenerateSignatures,
 ).map((e) => e.hash);
 
 export async function deployBridgeContracts(
   domainID: number,
-): Promise<[Bridge, Router, Executor]> {
+  routerAddress: string,
+): Promise<[Bridge, Router, Executor, BlockStorage]> {
   const [adminAccount] = await ethers.getSigners();
   const AccessControlSegregatorContract = await ethers.getContractFactory(
     "AccessControlSegregator",
@@ -119,11 +125,27 @@ export async function deployBridgeContracts(
     await bridgeInstance.getAddress(),
     await accessControlInstance.getAddress(),
   );
+  const BlockStorageContract = await ethers.getContractFactory("BlockStorage");
+  const blockStorageInstance = await BlockStorageContract.deploy();
+
   const ExecutorContract = await ethers.getContractFactory("Executor");
   const executorInstance = await ExecutorContract.deploy(
+    // this sets Executor contract to be deployed to the opposite
+    // domainID than the other contracts are deployed to
+    domainID == 1 ? 2 : 1,
     await bridgeInstance.getAddress(),
+    routerAddress,
+    await accessControlInstance.getAddress(),
+    1,
+    await blockStorageInstance.getAddress(),
+    2,
   );
-  return [bridgeInstance, routerInstance, executorInstance];
+  return [
+    bridgeInstance,
+    routerInstance,
+    executorInstance,
+    blockStorageInstance,
+  ];
 }
 
 export async function getDepositEventData(
@@ -133,7 +155,7 @@ export async function getDepositEventData(
     ((await depositTx.wait(1)) as TransactionReceipt).logs[2] as unknown as {
       args: string[];
     }
-  )["args"][4];
+  )["args"][5];
 }
 
 // This helper can be used to prepare execution data for PermissionlessGenericHandler
