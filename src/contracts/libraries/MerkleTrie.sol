@@ -4,10 +4,13 @@ pragma solidity ^0.8.0;
 import { Bytes } from "./Bytes.sol";
 import { RLPReader } from "./RLPReader.sol";
 
-/// @title MerkleTrie
-/// @notice MerkleTrie is a small library for verifying standard Ethereum Merkle-Patricia trie
-///         inclusion proofs. By default, this library assumes a hexary trie. One can change the
-///         trie radix constant to support other trie radixes.
+/**
+ * @custom:attribution https://github.com/ethereum-optimism/optimism/blob/develop/packages/contracts-bedrock/src/libraries/trie/MerkleTrie.sol
+ * @title MerkleTrie
+ * @notice MerkleTrie is a small library for verifying standard Ethereum Merkle-Patricia trie
+ *         inclusion proofs. By default, this library assumes a hexary trie. One can change the
+ *         trie radix constant to support other trie radixes.
+ */
 library MerkleTrie {
     /// @notice Struct representing a node in the trie.
     /// @custom:field encoded The RLP-encoded node.
