@@ -9,7 +9,7 @@ import "./interfaces/IAccessControlSegregator.sol";
 
 import "./interfaces/IBridge.sol";
 import "./interfaces/IHandler.sol";
-import "./interfaces/IBlockStorage.sol";
+import "./interfaces/IStateRootStorage.sol";
 import "./libraries/StorageProof.sol";
 
 
@@ -66,9 +66,7 @@ contract Executor is Context {
     }
 
     constructor(
-        uint8 originDomainID,
         address bridge,
-        address router,
         address accessControl,
         uint8 securityModel,
         address blockHeaderStorage,
@@ -77,7 +75,6 @@ contract Executor is Context {
         _bridge = IBridge(bridge);
         _domainID = _bridge._domainID();
         _accessControl = IAccessControlSegregator(accessControl);
-        _originDomainIDToRouter[originDomainID] = router;
         _securityModels[securityModel] = blockHeaderStorage;
         _slotIndex = slotIndex;
     }
@@ -117,8 +114,8 @@ contract Executor is Context {
             bytes32 storageRoot;
             address routerAddress = _originDomainIDToRouter[proposals[i].originDomainID];
 
-            IBlockStorage blockHeaderStorage = IBlockStorage(_securityModels[proposals[i].securityModel]);
-            stateRoot = IBlockStorage(blockHeaderStorage).getStateRoot(proposals[i].originDomainID, slot);
+            IStateRootStorage blockHeaderStorage = IStateRootStorage(_securityModels[proposals[i].securityModel]);
+            stateRoot = IStateRootStorage(blockHeaderStorage).getStateRoots(proposals[i].originDomainID, slot);
             storageRoot = StorageProof.getStorageRoot(accountProof, routerAddress, stateRoot);
             address handler = IBridge(_bridge)._resourceIDToHandlerAddress(proposals[i].resourceID);
             IHandler depositHandler = IHandler(handler);
@@ -178,8 +175,6 @@ contract Executor is Context {
     {
         bytes32 transferHash;
 
-        (bytes[] memory storageProof) = proposal.storageProof;
-
         transferHash = keccak256(
             abi.encode(
                 proposal.originDomainID,
@@ -194,7 +189,7 @@ contract Executor is Context {
             abi.encode(proposal.depositNonce, keccak256(abi.encode(_domainID, _slotIndex)))
         )));
 
-        bytes32 slotValue = StorageProof.getStorageValue(slotKey, storageRoot, storageProof);
+        bytes32 slotValue = StorageProof.getStorageValue(slotKey, storageRoot, proposal.storageProof);
         if (slotValue != transferHash) {
             revert TransferHashDoesNotMatchSlotValue(transferHash);
         }

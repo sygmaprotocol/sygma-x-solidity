@@ -6,6 +6,6 @@ pragma solidity 0.8.11;
     @title Interface for BlockStorage contract.
     @author ChainSafe Systems.
  */
-interface IBlockStorage {
-    function getStateRoot(uint8 domainID, uint256 blockNumber) external view returns (bytes32);
+interface IStateRootStorage {
+    function getStateRoots(uint8 domainID, uint256 slot) external view returns (bytes32);
 }

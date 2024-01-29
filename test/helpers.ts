@@ -8,7 +8,7 @@ import type {
   Bridge,
   Router,
   Executor,
-  BlockStorage,
+  StateRootStorage,
 } from "../typechain-types";
 
 export const blankFunctionSig = "0x00000000";
@@ -104,7 +104,7 @@ export const accessControlFuncSignatures = generateAccessControlFuncSignatures(
 export async function deployBridgeContracts(
   domainID: number,
   routerAddress: string,
-): Promise<[Bridge, Router, Executor, BlockStorage]> {
+): Promise<[Bridge, Router, Executor, StateRootStorage]> {
   const [adminAccount] = await ethers.getSigners();
   const AccessControlSegregatorContract = await ethers.getContractFactory(
     "AccessControlSegregator",
@@ -125,26 +125,28 @@ export async function deployBridgeContracts(
     await bridgeInstance.getAddress(),
     await accessControlInstance.getAddress(),
   );
-  const BlockStorageContract = await ethers.getContractFactory("BlockStorage");
-  const blockStorageInstance = await BlockStorageContract.deploy();
+  const StateRootStorageContract =
+    await ethers.getContractFactory("StateRootStorage");
+  const stateRootStorageInstance = await StateRootStorageContract.deploy();
 
   const ExecutorContract = await ethers.getContractFactory("Executor");
   const executorInstance = await ExecutorContract.deploy(
-    // this sets Executor contract to be deployed to the opposite
-    // domainID than the other contracts are deployed to
-    domainID == 1 ? 2 : 1,
     await bridgeInstance.getAddress(),
-    routerAddress,
     await accessControlInstance.getAddress(),
     1,
-    await blockStorageInstance.getAddress(),
+    await stateRootStorageInstance.getAddress(),
     2,
+  );
+  await executorInstance.adminChangeRouter(
+    // mock that the origin domain the is different than executor domainID
+    domainID == 1 ? 2 : 1,
+    routerAddress,
   );
   return [
     bridgeInstance,
     routerInstance,
     executorInstance,
-    blockStorageInstance,
+    stateRootStorageInstance,
   ];
 }
 
