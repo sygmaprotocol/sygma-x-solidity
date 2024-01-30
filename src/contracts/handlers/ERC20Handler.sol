@@ -80,7 +80,7 @@ contract ERC20Handler is IHandler, ERCHandlerHelpers, ERC20Safe {
     function executeProposal(
         bytes32 resourceID,
         bytes calldata data
-    ) external override onlyBridge {
+    ) external override onlyBridge returns (bytes memory) {
         uint256 amount;
         uint256 lenDestinationRecipientAddress;
         bytes memory destinationRecipientAddress;
@@ -103,6 +103,7 @@ contract ERC20Handler is IHandler, ERCHandlerHelpers, ERC20Safe {
         } else {
             releaseERC20(tokenAddress, address(recipientAddress), convertToExternalBalance(tokenAddress, amount));
         }
+        return abi.encode(tokenAddress, address(recipientAddress), amount);
     }
 
     /**

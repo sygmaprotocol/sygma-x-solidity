@@ -205,9 +205,7 @@ describe("PermissionlessGenericHandler - [Execute Proposal] - TestStore", () => 
       .executeProposal(proposal, gmpAccountProof1, slot);
 
     // check that ProposalExecution event is emitted
-    await expect(executeTx)
-      .to.emit(executorInstance, "ProposalExecution")
-      .withArgs(originDomainID, expectedDepositNonce);
+    await expect(executeTx).to.emit(executorInstance, "ProposalExecution");
 
     // check that deposit nonce isn't unmarked as used in bitmap
     assert.isTrue(

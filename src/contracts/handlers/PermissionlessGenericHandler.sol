@@ -209,7 +209,7 @@ contract PermissionlessGenericHandler is IHandler {
             After this, the target contract will get the following:
             executeFuncSignature(address executionDataDepositor, uint256[] uintArray, address addr)
      */
-    function executeProposal(bytes32 resourceID, bytes calldata data) external onlyExecutor {
+    function executeProposal(bytes32 resourceID, bytes calldata data) external onlyExecutor returns (bytes memory) {
         uint256 maxFee;
         uint16 lenExecuteFuncSignature;
         bytes4 executeFuncSignature;
@@ -255,5 +255,6 @@ contract PermissionlessGenericHandler is IHandler {
             executionData
         );
         (bool success, bytes memory returndata) = executeContractAddress.call{gas: maxFee}(callData);
+        return abi.encode(success, returndata);
     }
 }

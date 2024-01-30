@@ -30,9 +30,11 @@ describe("PermissionlessGenericHandler - [Execute Proposal] - packed deposit dat
 
   const feeData = "0x";
   const destinationMaxFee = BigInt(900000);
+  const handlerResponseLength = 64;
+  const contractCallReturndata = ethers.ZeroHash;
   const testDepositAddress = "0x7e62dE4008D51B0E91EaB6d21642e427dbBFb9Bb";
   const testStoreAddress = "0x5dc74c72438aECb5348f3121F1223B626627D826";
-  const testBridgeAddress = "e7f1725e7734ce288f8367e1bb143e90bb3f0512";
+  const testBridgeAddress = "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512";
   const securityModel = 1;
   const slot = 5183814;
   const routerAddress = "0x5c3B8962b03d004900b9bcaF79A3cAB056A3e740";
@@ -150,7 +152,14 @@ describe("PermissionlessGenericHandler - [Execute Proposal] - packed deposit dat
     // check that ProposalExecution event is emitted
     await expect(executeTx)
       .to.emit(executorInstance, "ProposalExecution")
-      .withArgs(originDomainID, expectedDepositNonce);
+      .withArgs(
+        originDomainID,
+        expectedDepositNonce,
+        ethers.AbiCoder.defaultAbiCoder().encode(
+          ["bool", "uint256", "bytes32"],
+          [true, handlerResponseLength, contractCallReturndata],
+        ),
+      );
 
     await expect(executeTx)
       .to.emit(testDepositInstance, "TestExecute")

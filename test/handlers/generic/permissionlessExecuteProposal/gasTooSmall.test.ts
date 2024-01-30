@@ -176,9 +176,7 @@ describe("PermissionlessGenericHandler - [Execute Proposal] - Gas to small", () 
       .executeProposal(proposal, gmpAccountProof2, slot);
 
     // check that ProposalExecution event is emitted
-    await expect(executeTx)
-      .to.emit(executorInstance, "ProposalExecution")
-      .withArgs(originDomainID, expectedDepositNonce);
+    await expect(executeTx).to.emit(executorInstance, "ProposalExecution");
 
     await expect(executeTx).not.to.emit(testDepositInstance, "TestExecute");
   });

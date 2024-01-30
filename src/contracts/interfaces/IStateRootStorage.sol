@@ -3,7 +3,7 @@
 pragma solidity 0.8.11;
 
 /**
-    @title Interface for BlockStorage contract.
+    @title Interface for StateRootStorage contract.
     @author ChainSafe Systems.
  */
 interface IStateRootStorage {

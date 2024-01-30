@@ -13,7 +13,7 @@ import type {
   Executor,
   ERC20Handler,
   ERC20PresetMinterPauser,
-  BlockStorage,
+  StateRootStorage,
 } from "../../typechain-types";
 
 describe("Bridge - [execute proposals]", () => {
@@ -35,7 +35,7 @@ describe("Bridge - [execute proposals]", () => {
   let executorInstance: Executor;
   let ERC20MintableInstance: ERC20PresetMinterPauser;
   let ERC20HandlerInstance: ERC20Handler;
-  let blockStorageInstance: BlockStorage;
+  let stateRootStorageInstance: StateRootStorage;
   let depositorAccount: HardhatEthersSigner;
   let recipientAccount: HardhatEthersSigner;
   let relayer1: HardhatEthersSigner;
@@ -56,8 +56,12 @@ describe("Bridge - [execute proposals]", () => {
     [, depositorAccount, recipientAccount, relayer1] =
       await ethers.getSigners();
 
-    [bridgeInstance, routerInstance, executorInstance, blockStorageInstance] =
-      await deployBridgeContracts(destinationDomainID, routerAddress);
+    [
+      bridgeInstance,
+      routerInstance,
+      executorInstance,
+      stateRootStorageInstance,
+    ] = await deployBridgeContracts(destinationDomainID, routerAddress);
     const ERC20MintableContract = await ethers.getContractFactory(
       "ERC20PresetMinterPauser",
     );
@@ -112,7 +116,11 @@ describe("Bridge - [execute proposals]", () => {
       },
     ];
 
-    await blockStorageInstance.storeStateRoot(originDomainID, slot, stateRoot);
+    await stateRootStorageInstance.storeStateRoot(
+      originDomainID,
+      slot,
+      stateRoot,
+    );
   });
 
   it("should create and execute executeProposal successfully", async () => {
@@ -230,7 +238,18 @@ describe("Bridge - [execute proposals]", () => {
 
     await expect(executeTx)
       .to.emit(executorInstance, "ProposalExecution")
-      .withArgs(originDomainID, expectedDepositNonces[0]);
+      .withArgs(
+        originDomainID,
+        expectedDepositNonces[0],
+        ethers.AbiCoder.defaultAbiCoder().encode(
+          ["address", "address", "uint256"],
+          [
+            await ERC20MintableInstance.getAddress(),
+            await recipientAccount.getAddress(),
+            depositAmount,
+          ],
+        ),
+      );
 
     // check that deposit nonces had been marked as used in bitmap
     expectedDepositNonces.map(async (_, index) => {

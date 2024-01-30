@@ -42,8 +42,9 @@ contract Executor is Context {
         bytes[] storageProof;
     }
 
-    event ProposalExecution(uint8 originDomainID, uint64 depositNonce);
+    event ProposalExecution(uint8 originDomainID, uint64 depositNonce, bytes handlerResponse);
     event FeeRouterChanged(uint8 originDomainID, address newRouter);
+    event FailedHandlerExecution(bytes lowLevelData, uint8 originDomainID, uint64 depositNonce);
 
     error EmptyProposalsArray();
     error BridgeIsPaused();
@@ -89,6 +90,7 @@ contract Executor is Context {
 
     /**
         @notice Executes a batch of deposit proposals using a specified handler contract for each proposal
+        @notice Failed executeProposal from handler don't revert, emits {FailedHandlerExecution} event.
         @param proposals Array of Proposal which consists of:
         - originDomainID ID of chain deposit originated from.
         - resourceID ResourceID to be used when making deposits.
@@ -121,8 +123,16 @@ contract Executor is Context {
             usedNonces[proposals[i].originDomainID][proposals[i].depositNonce / 256] |=
                 1 <<
                 (proposals[i].depositNonce % 256);
-            depositHandler.executeProposal(proposals[i].resourceID, proposals[i].data);
-            emit ProposalExecution(proposals[i].originDomainID, proposals[i].depositNonce);
+            try depositHandler.executeProposal(proposals[i].resourceID, proposals[i].data) returns (
+                bytes memory handlerResponse
+            ) {
+                emit ProposalExecution(proposals[i].originDomainID, proposals[i].depositNonce, handlerResponse);
+            } catch (bytes memory lowLevelData) {
+                emit FailedHandlerExecution(lowLevelData, proposals[i].originDomainID, proposals[i].depositNonce);
+                usedNonces[proposals[i].originDomainID][proposals[i].depositNonce / 256] &= ~(1 <<
+                    (proposals[i].depositNonce % 256));
+                continue;
+            }
         }
     }
 

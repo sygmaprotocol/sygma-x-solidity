@@ -14,7 +14,7 @@ import type {
   Executor,
   ERC20Handler,
   ERC20PresetMinterPauser,
-  BlockStorage,
+  StateRootStorage,
 } from "../../../typechain-types";
 
 describe("E2E ERC20 - Same Chain", () => {
@@ -37,7 +37,7 @@ describe("E2E ERC20 - Same Chain", () => {
   let executorInstance: Executor;
   let ERC20MintableInstance: ERC20PresetMinterPauser;
   let ERC20HandlerInstance: ERC20Handler;
-  let blockStorageInstance: BlockStorage;
+  let stateRootStorageInstance: StateRootStorage;
   let depositorAccount: HardhatEthersSigner;
   let recipientAccount: HardhatEthersSigner;
   let relayer1: HardhatEthersSigner;
@@ -59,8 +59,12 @@ describe("E2E ERC20 - Same Chain", () => {
     [, depositorAccount, recipientAccount, relayer1] =
       await ethers.getSigners();
 
-    [bridgeInstance, routerInstance, executorInstance, blockStorageInstance] =
-      await deployBridgeContracts(destinationDomainID, routerAddress);
+    [
+      bridgeInstance,
+      routerInstance,
+      executorInstance,
+      stateRootStorageInstance,
+    ] = await deployBridgeContracts(destinationDomainID, routerAddress);
     const ERC20MintableContract = await ethers.getContractFactory(
       "ERC20PresetMinterPauser",
     );
@@ -110,7 +114,11 @@ describe("E2E ERC20 - Same Chain", () => {
       storageProof: storageProof1[0].proof,
     };
 
-    await blockStorageInstance.storeStateRoot(originDomainID, slot, stateRoot);
+    await stateRootStorageInstance.storeStateRoot(
+      originDomainID,
+      slot,
+      stateRoot,
+    );
   });
 
   it("[sanity] depositorAccount' balance should be equal to initialTokenAmount", async () => {

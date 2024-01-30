@@ -23,7 +23,7 @@ import type {
   ERC20PresetMinterPauser,
   Executor,
   Router,
-  BlockStorage,
+  StateRootStorage,
 } from "../../../../typechain-types";
 
 describe("E2E ERC20 - Two EVM Chains, one with decimal places == 18, other with == 0", () => {
@@ -63,7 +63,7 @@ describe("E2E ERC20 - Two EVM Chains, one with decimal places == 18, other with 
   let originBridgeInstance: Bridge;
   let originRouterInstance: Router;
   let originExecutorInstance: Executor;
-  let originBlockStorageInstance: BlockStorage;
+  let originStateRootStorageInstance: StateRootStorage;
   let originERC20MintableInstance: ERC20PresetMinterPauser;
   let originERC20HandlerInstance: ERC20Handler;
   let originRelayer1: HardhatEthersSigner;
@@ -71,7 +71,7 @@ describe("E2E ERC20 - Two EVM Chains, one with decimal places == 18, other with 
   let destinationBridgeInstance: Bridge;
   let destinationRouterInstance: Router;
   let destinationExecutorInstance: Executor;
-  let destinationBlockStorageInstance: BlockStorage;
+  let destinationStateRootStorageInstance: StateRootStorage;
   let destinationDepositData: string;
   let destinationResourceID: string;
   let destinationERC20MintableInstance: ERC20PresetMinterPauser;
@@ -101,13 +101,13 @@ describe("E2E ERC20 - Two EVM Chains, one with decimal places == 18, other with 
       originBridgeInstance,
       originRouterInstance,
       originExecutorInstance,
-      originBlockStorageInstance,
+      originStateRootStorageInstance,
     ] = await deployBridgeContracts(originDomainID, originRouterAddress);
     [
       destinationBridgeInstance,
       destinationRouterInstance,
       destinationExecutorInstance,
-      destinationBlockStorageInstance,
+      destinationStateRootStorageInstance,
     ] = await deployBridgeContracts(
       destinationDomainID,
       destinationRouterAddress,
@@ -210,12 +210,12 @@ describe("E2E ERC20 - Two EVM Chains, one with decimal places == 18, other with 
       storageProof: storageProof6[0].proof,
     };
 
-    await destinationBlockStorageInstance.storeStateRoot(
+    await destinationStateRootStorageInstance.storeStateRoot(
       originDomainID,
       destinationSlot,
       destinationStateRoot,
     );
-    await originBlockStorageInstance.storeStateRoot(
+    await originStateRootStorageInstance.storeStateRoot(
       destinationDomainID,
       originSlot,
       originStateRoot,
