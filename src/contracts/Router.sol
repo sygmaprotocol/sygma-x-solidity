@@ -24,8 +24,6 @@ contract Router is Context {
     IAccessControlSegregator public _accessControl;
     uint8 public immutable _domainID;
 
-    // securityModel => block header storage address
-    mapping(uint8 => address) public _securityModels;
     // domainID => nonce => transferHashes
     mapping(uint8 => mapping(uint256 => bytes32)) public transferHashes;
     // destinationDomainID => number of deposits

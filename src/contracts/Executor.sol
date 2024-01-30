@@ -26,7 +26,7 @@ contract Executor is Context {
     uint8 public constant SLOT_INDEX = 2;
     IAccessControlSegregator public _accessControl;
 
-    // securityModel => block header storage address
+    // securityModel => state root storage contract address
     mapping(uint8 => address) public _securityModels;
     // origin domainID => nonces set => used deposit nonces
     mapping(uint8 => mapping(uint256 => uint256)) public usedNonces;
@@ -44,7 +44,6 @@ contract Executor is Context {
 
     event ProposalExecution(uint8 originDomainID, uint64 depositNonce);
     event FeeRouterChanged(uint8 originDomainID, address newRouter);
-    event SlotIndexChanged(uint256 slotIndex);
 
     error EmptyProposalsArray();
     error BridgeIsPaused();
@@ -69,12 +68,12 @@ contract Executor is Context {
         address bridge,
         address accessControl,
         uint8 securityModel,
-        address blockHeaderStorage
+        address stateRootStorage
     ) {
         _bridge = IBridge(bridge);
         _domainID = _bridge._domainID();
         _accessControl = IAccessControlSegregator(accessControl);
-        _securityModels[securityModel] = blockHeaderStorage;
+        _securityModels[securityModel] = stateRootStorage;
     }
 
     /**
@@ -112,8 +111,8 @@ contract Executor is Context {
             bytes32 storageRoot;
             address routerAddress = _originDomainIDToRouter[proposals[i].originDomainID];
 
-            IStateRootStorage blockHeaderStorage = IStateRootStorage(_securityModels[proposals[i].securityModel]);
-            stateRoot = blockHeaderStorage.getStateRoots(proposals[i].originDomainID, slot);
+            IStateRootStorage stateRootStorage = IStateRootStorage(_securityModels[proposals[i].securityModel]);
+            stateRoot = stateRootStorage.getStateRoots(proposals[i].originDomainID, slot);
             storageRoot = StorageProof.getStorageRoot(accountProof, routerAddress, stateRoot);
             address handler = IBridge(_bridge)._resourceIDToHandlerAddress(proposals[i].resourceID);
             IHandler depositHandler = IHandler(handler);
