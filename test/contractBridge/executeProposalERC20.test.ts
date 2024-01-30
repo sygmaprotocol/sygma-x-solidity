@@ -249,15 +249,46 @@ describe("Bridge - [execute proposal - ERC20]", () => {
       await ERC20MintableInstance.balanceOf(recipientAccount);
     assert.strictEqual(recipientBalance, BigInt(depositAmount));
   });
-});
 
-// access seg: 0x18e2864e93f5920fEf54b4906c32B68DC74104d2
-// bridge domainID=1: 0xbFD940A6316169a0774709BA46bb27138A436fB5
-// bridge domainID=2: 0x63523D3139ea7d7ebc9220905Cb2bA3D7c3d0d62
-// router2: 0x823E4FB060AEd9d5587e63d0B3324E28Ed1C78F8
-// depositData2: 0x000000000000000000000000000000000000000000000000000000000000000a0000000000000000000000000000000000000000000000000000000000000014f39Fd6e51aad88F6F4ce6aB8827279cffFb92266
-// dest domainID=1 slot key: 0x7fc34355029a161f70aeee0386d9a2fb9a2518cf3f40dfaefce746c3a701bdb7
-// account1 0x70997970C51812dc3A010C7d01b50e0d17dc79C8
-// account2 0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC
-// account3 0x90F79bf6EB2c4f870365E785982E1f101E93b906
-// account4 0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65
+  it("should fail if origin domain verified data differs than destination domain data", async () => {
+    // depositorAccount makes initial deposit of depositAmount
+    assert.isFalse(await bridgeInstance.paused());
+    await expect(
+      routerInstance
+        .connect(depositorAccount)
+        .deposit(
+          originDomainID,
+          resourceID,
+          securityModel,
+          depositData,
+          feeData,
+        ),
+    ).not.to.be.reverted;
+
+    const invalidDepositNone = 2;
+    const invalidProposal = {
+      originDomainID: originDomainID,
+      securityModel: securityModel,
+      depositNonce: invalidDepositNone,
+      resourceID: resourceID,
+      data: depositProposalData,
+      storageProof: storageProof1[0].proof,
+    };
+
+    const proposalTx = executorInstance
+      .connect(relayer1)
+      .executeProposal(invalidProposal, accountProof1, slot);
+
+    await expect(proposalTx).to.be.revertedWith(
+      "MerkleTrie: invalid large internal hash",
+    );
+
+    // check that deposit nonce has not been marked as used in bitmap
+    assert.isFalse(
+      await executorInstance.isProposalExecuted(
+        originDomainID,
+        expectedDepositNonce,
+      ),
+    );
+  });
+});
