@@ -1,7 +1,7 @@
 // The Licensed Work is (c) 2022 Sygma
 // SPDX-License-Identifier: LGPL-3.0-only
 
-import { ethers } from "hardhat";
+import { ethers, network } from "hardhat";
 import type { TransactionReceipt, TransactionResponse } from "ethers";
 import { generateAccessControlFuncSignatures } from "../scripts/utils";
 import type {
@@ -9,6 +9,8 @@ import type {
   Router,
   Executor,
   StateRootStorage,
+  TestStore,
+  TestDeposit,
 } from "../typechain-types";
 
 export const blankFunctionSig = "0x00000000";
@@ -179,6 +181,46 @@ export function createPermissionlessGenericExecutionData(
   );
 }
 
+export async function deployMockTestContracts(
+  testStoreAddress: string,
+  testDepositAddress: string,
+): Promise<[TestStore, TestDeposit]> {
+  // Deploy fake contracts to generate bytecode and override address for proof  verification logic
+  const fakeTestStore = await ethers.getContractFactory("TestStore");
+  const fakeTestStoreInstance = await fakeTestStore.deploy();
+  const fakeTestDeposit = await ethers.getContractFactory("TestDeposit");
+  const fakeTestDepositInstance = await fakeTestDeposit.deploy();
+  // Get bytecode of the deployed contract using "eth_getCode"
+  const fakeTestStoreInstanceBytecode = await network.provider.send(
+    "eth_getCode",
+    [await fakeTestStoreInstance.getAddress()],
+  );
+  const fakeTestDepositInstanceBytecode = await network.provider.send(
+    "eth_getCode",
+    [await fakeTestDepositInstance.getAddress()],
+  );
+  // Set bytecode at the target contract address with the fake contract bytecode
+  await network.provider.send("hardhat_setCode", [
+    testStoreAddress,
+    fakeTestStoreInstanceBytecode,
+  ]);
+  await network.provider.send("hardhat_setCode", [
+    testDepositAddress,
+    fakeTestDepositInstanceBytecode,
+  ]);
+  // Fetch contract instances
+  const testStoreInstance = await ethers.getContractAt(
+    "TestStore",
+    testStoreAddress,
+  );
+  const testDepositInstance = await ethers.getContractAt(
+    "TestDeposit",
+    testDepositAddress,
+  );
+
+  return [testStoreInstance, testDepositInstance];
+}
+
 module.exports = {
   blankFunctionSig,
   blankFunctionDepositorOffset,
@@ -193,4 +235,5 @@ module.exports = {
   deployBridgeContracts,
   createPermissionlessGenericExecutionData,
   getDepositEventData,
+  deployMockTestContracts,
 };
