@@ -114,7 +114,7 @@ contract Executor is Context {
             address routerAddress = _originDomainIDToRouter[proposals[i].originDomainID];
 
             IStateRootStorage stateRootStorage = IStateRootStorage(_securityModels[proposals[i].securityModel]);
-            stateRoot = stateRootStorage.getStateRoots(proposals[i].originDomainID, slot);
+            stateRoot = stateRootStorage.getStateRoot(proposals[i].originDomainID, slot);
             storageRoot = StorageProof.getStorageRoot(accountProof, routerAddress, stateRoot);
             address handler = IBridge(_bridge)._resourceIDToHandlerAddress(proposals[i].resourceID);
             IHandler depositHandler = IHandler(handler);

@@ -218,7 +218,7 @@ contract TestDeposit {
 contract StateRootStorage {
     mapping(uint8 => mapping(uint256 => bytes32)) public _stateRoots;
 
-    function getStateRoots(uint8 domainID, uint256 blockNumber) public view returns (bytes32) {
+    function getStateRoot(uint8 domainID, uint256 blockNumber) public view returns (bytes32) {
         return _stateRoots[domainID][blockNumber];
     }
 
