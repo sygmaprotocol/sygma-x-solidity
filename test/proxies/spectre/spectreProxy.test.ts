@@ -179,6 +179,13 @@ describe("Spectre Proxy", () => {
       ),
       validStateRoot,
     );
+    assert.equal(
+      await spectreProxyInstance.getStateRoot(
+        validDomainID,
+        stepInput.finalizedSlot,
+      ),
+      validStateRoot,
+    );
     await expect(stepTx)
       .to.emit(spectreProxyInstance, "StateRootSubmitted")
       .withArgs(validDomainID, stepInput.finalizedSlot, validStateRoot);

@@ -80,7 +80,7 @@ contract SpectreProxy is AccessControl {
 
         emit CommitteeRotated(sourceDomainID, stepInput.attestedSlot);
     }
-    
+
     /**
         @notice Proxy for the Spectre step function that proves and stores the execution state root
         @param input The input to the sync step. Defines the slot and attestation to verify
@@ -111,6 +111,17 @@ contract SpectreProxy is AccessControl {
         emit StateRootSubmitted(sourceDomainID, input.finalizedSlot, stateRoot);
 
     }
+
+    /**
+        @notice Returns a state root.
+        @param sourceDomainID ID of chain state root originated from.
+        @param slot slot number of the state root.
+        @return State root for the given domain ID and slot.
+     */
+    function getStateRoot(uint8 sourceDomainID, uint256 slot)  public view returns (bytes32) {
+        return stateRoots[sourceDomainID][slot];
+    }
+    
 
     function verifyMerkleBranch(
         bytes32 leaf, 
