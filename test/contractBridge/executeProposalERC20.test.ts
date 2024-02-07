@@ -69,6 +69,7 @@ describe("Bridge - [execute proposal - ERC20]", () => {
       "ERC20PresetMinterPauser",
     );
     ERC20MintableInstance = await ERC20MintableContract.deploy("Token", "TOK");
+
     const ERC20HandlerContract =
       await ethers.getContractFactory("ERC20Handler");
     ERC20HandlerInstance = await ERC20HandlerContract.deploy(
@@ -309,5 +310,110 @@ describe("Bridge - [execute proposal - ERC20]", () => {
         expectedDepositNonce,
       ),
     );
+  });
+
+  describe("Multiple verifiers", () => {
+    const nonMatchingStateRoot =
+      "0xed91524a194957d604ab37fd1c8aa37e9435714c31e8c788819a1b6d8f1ff783";
+
+    let secondStateRootStorageInstance: StateRootStorage;
+    let thirdStateRootStorageInstance: StateRootStorage;
+
+    beforeEach(async () => {
+      const StateRootStorageContract =
+        await ethers.getContractFactory("StateRootStorage");
+      secondStateRootStorageInstance = await StateRootStorageContract.deploy();
+      thirdStateRootStorageInstance = await StateRootStorageContract.deploy();
+
+      await secondStateRootStorageInstance.storeStateRoot(
+        originDomainID,
+        slot,
+        stateRoot,
+      );
+      await thirdStateRootStorageInstance.storeStateRoot(
+        originDomainID,
+        slot,
+        stateRoot,
+      );
+
+      // deploy executor contract with 3 state root storage instances
+      await executorInstance.adminSetVerifiers(1, [
+        await stateRootStorageInstance.getAddress(),
+        await secondStateRootStorageInstance.getAddress(),
+        await thirdStateRootStorageInstance.getAddress(),
+      ]);
+    });
+
+    it("should successfully execute a proposal", async () => {
+      // depositorAccount makes initial deposit of depositAmount
+      assert.isFalse(await bridgeInstance.paused());
+      await expect(
+        routerInstance
+          .connect(depositorAccount)
+          .deposit(
+            originDomainID,
+            resourceID,
+            securityModel,
+            depositData,
+            feeData,
+          ),
+      ).not.to.be.reverted;
+      await expect(
+        executorInstance
+          .connect(relayer1)
+          .executeProposal(proposal, accountProof1, slot),
+      ).not.to.be.reverted;
+
+      // check that deposit nonce has been marked as used in bitmap
+      assert.isTrue(
+        await executorInstance.isProposalExecuted(
+          originDomainID,
+          expectedDepositNonce,
+        ),
+      );
+
+      // check that tokens are transferred to recipient address
+      const recipientBalance =
+        await ERC20MintableInstance.balanceOf(recipientAccount);
+      assert.strictEqual(recipientBalance, BigInt(depositAmount));
+    });
+
+    it("should fail to execute a proposal if state roots do not match", async () => {
+      // save an invalid state root
+      await thirdStateRootStorageInstance.storeStateRoot(
+        originDomainID,
+        slot,
+        nonMatchingStateRoot,
+      );
+      // depositorAccount makes initial deposit of depositAmount
+      assert.isFalse(await bridgeInstance.paused());
+      await expect(
+        routerInstance
+          .connect(depositorAccount)
+          .deposit(
+            originDomainID,
+            resourceID,
+            securityModel,
+            depositData,
+            feeData,
+          ),
+      ).not.to.be.reverted;
+      await expect(
+        executorInstance
+          .connect(relayer1)
+          .executeProposal(proposal, accountProof1, slot),
+      ).to.be.revertedWithCustomError(
+        executorInstance,
+        "StateRootDoesNotMatch",
+      );
+
+      // check that deposit nonce has been marked as used in bitmap
+      assert.isFalse(
+        await executorInstance.isProposalExecuted(
+          originDomainID,
+          expectedDepositNonce,
+        ),
+      );
+    });
   });
 });

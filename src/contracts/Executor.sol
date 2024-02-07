@@ -27,8 +27,8 @@ contract Executor is Context {
 
     // originDomainID => slot index number
     mapping(uint8 => uint8) public _slotIndexes;
-    // securityModel => state root storage contract address
-    mapping(uint8 => address) public _securityModels;
+    // securityModel => state root storage contract addresses
+    mapping(uint8 => address[]) public _securityModels;
     // origin domainID => nonces set => used deposit nonces
     mapping(uint8 => mapping(uint256 => uint256)) public usedNonces;
     //  origin domainID => router address
@@ -51,6 +51,7 @@ contract Executor is Context {
     error BridgeIsPaused();
     error AccessNotAllowed(address sender, bytes4 funcSig);
     error TransferHashDoesNotMatchSlotValue(bytes32 transferHash);
+    error StateRootDoesNotMatch(bytes32 stateRoot);
 
     modifier onlyAllowed() {
         _onlyAllowed(msg.sig, _msgSender());
@@ -68,14 +69,11 @@ contract Executor is Context {
 
     constructor(
         address bridge,
-        address accessControl,
-        uint8 securityModel,
-        address stateRootStorage
+        address accessControl
     ) {
         _bridge = IBridge(bridge);
         _domainID = _bridge._domainID();
         _accessControl = IAccessControlSegregator(accessControl);
-        _securityModels[securityModel] = stateRootStorage;
     }
 
     /**
@@ -101,6 +99,17 @@ contract Executor is Context {
     }
 
     /**
+        @notice Maps the {securityModel} to {verifiersAddresses} in _securitModels.
+        @notice Only callable by address that has the right to call the specific function,
+        which is mapped in {functionAccess} in AccessControlSegregator contract.
+        @param securityModel .
+        @param verifiersAddresses Array of verifiers addresses which store state roots.
+     */
+    function adminSetVerifiers(uint8 securityModel, address[] memory verifiersAddresses) external onlyAllowed {
+        _securityModels[securityModel] = verifiersAddresses;
+    }
+
+    /**
         @notice Executes a batch of deposit proposals using a specified handler contract for each proposal
         @notice Failed executeProposal from handler don't revert, emits {FailedHandlerExecution} event.
         @param proposals Array of Proposal which consists of:
@@ -121,13 +130,22 @@ contract Executor is Context {
             if (isProposalExecuted(proposals[i].originDomainID, proposals[i].depositNonce)) {
                 continue;
             }
-            bytes32 stateRoot;
+            bytes32 expectedStateRoot;
             bytes32 storageRoot;
             address routerAddress = _originDomainIDToRouter[proposals[i].originDomainID];
 
-            IStateRootStorage stateRootStorage = IStateRootStorage(_securityModels[proposals[i].securityModel]);
-            stateRoot = stateRootStorage.getStateRoot(proposals[i].originDomainID, slot);
-            storageRoot = StorageProof.getStorageRoot(accountProof, routerAddress, stateRoot);
+            IStateRootStorage checkingStateRootStorage = IStateRootStorage(
+                _securityModels[proposals[i].securityModel][0]
+            );
+            expectedStateRoot = checkingStateRootStorage.getStateRoot(proposals[i].originDomainID, slot);
+
+            for (uint256 j = 1; j < _securityModels[proposals[i].securityModel].length; j++) {
+                IStateRootStorage stateRootStorage = IStateRootStorage(_securityModels[proposals[i].securityModel][j]);
+                bytes32 stateRoot = stateRootStorage.getStateRoot(proposals[i].originDomainID, slot);
+                if(expectedStateRoot != stateRoot) revert StateRootDoesNotMatch(stateRoot);
+            }
+
+            storageRoot = StorageProof.getStorageRoot(accountProof, routerAddress, expectedStateRoot);
             address handler = IBridge(_bridge)._resourceIDToHandlerAddress(proposals[i].resourceID);
             IHandler depositHandler = IHandler(handler);
             verify(proposals[i], storageRoot);
