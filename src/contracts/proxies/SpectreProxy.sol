@@ -13,7 +13,7 @@ import "../utils/AccessControl.sol";
  */
 contract SpectreProxy is AccessControl {
 
-    uint8 public constant STATE_ROOT_INDEX = 18;
+    uint8 public constant STATE_ROOT_INDEX = 34;
 
     // source domainID => slot => state root
     mapping(uint8 => mapping(uint256 => bytes32)) public stateRoots;
