@@ -7,6 +7,7 @@
   "scripts": {
     "compile": "npx hardhat compile",
     "coverage": "npx hardhat coverage",
+    "deploy":"npx hardhat deploy --network",
     "lint:typescript": "eslint 'test/**/*.ts' 'scripts/**/*.ts'",
     "lint:typescript:fix": "prettier --config .prettierrc.json --write 'scripts/**/*.ts' 'test/**/*.ts' 'hardhat.config.ts'",
     "lint:solidity": "npx solhint 'src/contracts/**/*.sol'",
@@ -39,6 +40,7 @@
     "eslint-plugin-prettier": "^5.0.1",
     "ethers": "^6.7.1",
     "hardhat": "^2.17.4",
+    "hardhat-deploy": "^0.11.45",
     "hardhat-gas-reporter": "^1.0.8",
     "hardhat-preprocessor": "^0.1.5",
     "prettier": "^3.0.3",
@@ -50,5 +52,8 @@
     "tslint-config-prettier": "^1.18.0",
     "typechain": "^8.1.0",
     "typescript": ">=4.5.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.1"
   }
 }

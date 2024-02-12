@@ -1,7 +1,9 @@
 import fs from "fs";
 import { resolve } from "path";
-import type { InterfaceAbi, Fragment } from "ethers";
+import { deployments, run } from "hardhat";
 import { keccak256, ContractFactory } from "ethers";
+import type { InterfaceAbi, Fragment } from "ethers";
+import type { DeployResult } from "hardhat-deploy/dist/types";
 
 export function generateAccessControlFuncSignatures(contracts: Array<string>): {
   function: string;
@@ -66,4 +68,21 @@ export function generateAccessControlFuncSignatures(contracts: Array<string>): {
   console.table(allAccessControlFuncSignatures);
 
   return allAccessControlFuncSignatures;
+}
+
+export async function verifyContract(
+  contractAddress: DeployResult,
+  constructorArgs: unknown[],
+): Promise<void> {
+  if (
+    deployments.getNetworkName() != "localhost" &&
+    deployments.getNetworkName() != "hardhat"
+  ) {
+    // wait 30 seconds for contract to be deployed before trying to verify
+    await new Promise((resolve) => setTimeout(resolve, 30000));
+    await run("verify:verify", {
+      address: contractAddress.address,
+      constructorArguments: constructorArgs,
+    });
+  }
 }
