@@ -22,12 +22,12 @@ export function generateAccessControlFuncSignatures(contracts: Array<string>): {
       `../artifacts/src/contracts/${contractName}.sol/${contractName}.json`,
     );
 
-    const bridgeArtifacts = JSON.parse(
+    const contractArtifacts = JSON.parse(
       fs.readFileSync(ARTIFACTS_PATH).toString(),
     );
     const contractFactory = new ContractFactory(
-      bridgeArtifacts.abi as InterfaceAbi,
-      bridgeArtifacts.bytecode as string,
+      contractArtifacts.abi as InterfaceAbi,
+      contractArtifacts.bytecode as string,
     );
     const contractMethods = contractFactory.interface.fragments
       .map((fragment: Fragment) => {
@@ -53,7 +53,7 @@ export function generateAccessControlFuncSignatures(contracts: Array<string>): {
       b.push(a[0].split(/[\s()]+/)[1]);
     }
 
-    // filter out from Bridge ABI functions signatures with "onlyAllowed" modifier
+    // filter out from contracts ABI functions signatures with "onlyAllowed" modifier
     const accessControlFuncSignatures = contractMethods
       .filter((el1) => b.some((el2) => el1.includes(el2)))
       .map((func) => ({

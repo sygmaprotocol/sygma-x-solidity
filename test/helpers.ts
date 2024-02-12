@@ -107,6 +107,7 @@ export async function deployBridgeContracts(
   domainID: number,
   routerAddress: string,
 ): Promise<[Bridge, Router, Executor, StateRootStorage]> {
+  const securityModel = 1;
   const [adminAccount] = await ethers.getSigners();
   const AccessControlSegregatorContract = await ethers.getContractFactory(
     "AccessControlSegregator",
@@ -130,13 +131,10 @@ export async function deployBridgeContracts(
   const StateRootStorageContract =
     await ethers.getContractFactory("StateRootStorage");
   const stateRootStorageInstance = await StateRootStorageContract.deploy();
-
   const ExecutorContract = await ethers.getContractFactory("Executor");
   const executorInstance = await ExecutorContract.deploy(
     await bridgeInstance.getAddress(),
     await accessControlInstance.getAddress(),
-    1,
-    await stateRootStorageInstance.getAddress(),
   );
   await executorInstance.adminChangeRouter(
     // mock that the origin domain the is different than executor domainID
@@ -145,6 +143,10 @@ export async function deployBridgeContracts(
   );
   // depending on domainID value, set source domain IDs slot index to 2
   await executorInstance.adminChangeSlotIndex(domainID == 1 ? 2 : 1, 2);
+
+  await executorInstance.adminSetVerifiers(securityModel, [
+    await stateRootStorageInstance.getAddress(),
+  ]);
 
   return [
     bridgeInstance,
