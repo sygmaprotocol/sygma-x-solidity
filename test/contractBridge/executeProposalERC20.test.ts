@@ -344,6 +344,12 @@ describe("Bridge - [execute proposal - ERC20]", () => {
       ]);
     });
 
+    it("[sanity] should fail if verifiers array is empty", async () => {
+      await expect(
+        executorInstance.adminSetVerifiers(1, []),
+      ).to.be.rejectedWith("Should provide at least one verifier address");
+    });
+
     it("should successfully execute a proposal", async () => {
       // depositorAccount makes initial deposit of depositAmount
       assert.isFalse(await bridgeInstance.paused());

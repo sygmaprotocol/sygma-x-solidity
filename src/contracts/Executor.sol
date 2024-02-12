@@ -51,7 +51,7 @@ contract Executor is Context {
     error BridgeIsPaused();
     error AccessNotAllowed(address sender, bytes4 funcSig);
     error TransferHashDoesNotMatchSlotValue(bytes32 transferHash);
-    error StateRootDoesNotMatch(bytes32 stateRoot);
+    error StateRootDoesNotMatch(IStateRootStorage stateRootStorage, bytes32 stateRoot);
 
     modifier onlyAllowed() {
         _onlyAllowed(msg.sig, _msgSender());
@@ -106,6 +106,7 @@ contract Executor is Context {
         @param verifiersAddresses Array of verifiers addresses which store state roots.
      */
     function adminSetVerifiers(uint8 securityModel, address[] memory verifiersAddresses) external onlyAllowed {
+        require(verifiersAddresses.length > 0, "Should provide at least one verifier address");
         _securityModels[securityModel] = verifiersAddresses;
     }
 
@@ -138,11 +139,12 @@ contract Executor is Context {
                 _securityModels[proposals[i].securityModel][0]
             );
             expectedStateRoot = checkingStateRootStorage.getStateRoot(proposals[i].originDomainID, slot);
+            uint256 numberOfSecurityModels = _securityModels[proposals[i].securityModel].length;
 
-            for (uint256 j = 1; j < _securityModels[proposals[i].securityModel].length; j++) {
+            for (uint256 j = 1; j < numberOfSecurityModels; j++) {
                 IStateRootStorage stateRootStorage = IStateRootStorage(_securityModels[proposals[i].securityModel][j]);
                 bytes32 stateRoot = stateRootStorage.getStateRoot(proposals[i].originDomainID, slot);
-                if(expectedStateRoot != stateRoot) revert StateRootDoesNotMatch(stateRoot);
+                if(expectedStateRoot != stateRoot) revert StateRootDoesNotMatch(stateRootStorage, stateRoot);
             }
 
             storageRoot = StorageProof.getStorageRoot(accountProof, routerAddress, expectedStateRoot);
