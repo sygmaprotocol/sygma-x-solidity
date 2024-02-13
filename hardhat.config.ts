@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
 import * as dotenv from "dotenv";
 
 import type { HardhatUserConfig } from "hardhat/config";
