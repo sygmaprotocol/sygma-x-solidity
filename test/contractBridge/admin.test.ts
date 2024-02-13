@@ -298,7 +298,7 @@ describe("Bridge - [admin]", () => {
     );
   });
 
-  // Set nonce
+  // Nonces manipulation
 
   it("Should set nonce", async () => {
     const nonce = 3;
@@ -329,6 +329,31 @@ describe("Bridge - [admin]", () => {
         .connect(tokenOwnerAccount)
         .adminSetDepositNonce(domainID, newNonce),
     ).to.be.revertedWith("Does not allow decrements of the nonce");
+  });
+
+  it("Should require admin role to mark nonce as used", async () => {
+    const nonce = 5;
+    await expect(
+      executorInstance
+        .connect(nonAdminAccount)
+        .adminMarkNonceAsUsed(domainID, nonce),
+    ).to.be.revertedWithCustomError(
+      executorInstance,
+      "AccessNotAllowed(address,bytes4)",
+    );
+  });
+
+  it("Should successfully mark nonce as used", async () => {
+    const usedNonce = 5;
+    await executorInstance
+      .connect(tokenOwnerAccount)
+      .adminMarkNonceAsUsed(domainID, usedNonce);
+    const isNonceUsed = await executorInstance.isProposalExecuted(
+      domainID,
+      usedNonce,
+    );
+
+    assert.isTrue(isNonceUsed, "Nonce wasn't successfully marked as used");
   });
 
   // Change access control contract

@@ -111,6 +111,16 @@ contract Executor is Context {
     }
 
     /**
+        @notice Exposes {markNonceAsUsed} function to an address that has the right to call the
+        specific function, which is mapped in {functionAccess} in AccessControlSegregator contract.
+        @param originDomainID domain from which the proposal originated.
+        @param depositNonce nonce of a proposal that should be marked as used.
+     */
+    function adminMarkNonceAsUsed(uint8 originDomainID, uint64 depositNonce) public onlyAllowed {
+        markNonceAsUsed(originDomainID, depositNonce);
+    }
+
+    /**
         @notice Executes a batch of deposit proposals using a specified handler contract for each proposal
         @notice Failed executeProposal from handler don't revert, emits {FailedHandlerExecution} event.
         @param proposals Array of Proposal which consists of:
@@ -152,9 +162,7 @@ contract Executor is Context {
             IHandler depositHandler = IHandler(handler);
             verify(proposals[i], storageRoot);
 
-            usedNonces[proposals[i].originDomainID][proposals[i].depositNonce / 256] |=
-                1 <<
-                (proposals[i].depositNonce % 256);
+            markNonceAsUsed(proposals[i].originDomainID, proposals[i].depositNonce);
             try depositHandler.executeProposal(proposals[i].resourceID, proposals[i].data) returns (
                 bytes memory handlerResponse
             ) {
@@ -233,5 +241,16 @@ contract Executor is Context {
             revert TransferHashDoesNotMatchSlotValue(transferHash);
         }
         return true;
+    }
+
+    /**
+        @notice Marks a certain nonce that originated from a domain as used.
+        @param originDomainID domain from which the proposal originated.
+        @param depositNonce nonce of a proposal that should be marked as used.
+     */
+    function markNonceAsUsed(uint8 originDomainID, uint64 depositNonce) private {
+        usedNonces[originDomainID][depositNonce / 256] |=
+            1 <<
+        (depositNonce % 256);
     }
 }
