@@ -4,6 +4,10 @@
   "main": "index.js",
   "author": "Sygma",
   "license": "BUSL-1.1",
+  "files":[
+    "artifacts",
+    "typechain-types"
+  ],
   "scripts": {
     "compile": "npx hardhat compile",
     "coverage": "npx hardhat coverage",
