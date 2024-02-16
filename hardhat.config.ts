@@ -21,6 +21,9 @@ const config: HardhatUserConfig = {
     },
   },
   networks: {
+    local: {
+      url: `http://127.0.0.1:8545`,
+    },
     sepolia: {
       url: `${process.env.SEPOLIA_PROVIDER_URL}`,
       accounts: [

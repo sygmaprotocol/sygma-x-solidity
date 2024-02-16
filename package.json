@@ -14,7 +14,8 @@
     "lint:solidity:fix": "prettier --write --plugin=prettier-plugin-solidity 'src/contracts/**/*.sol'",
     "lint:all": "yarn run lint:typescript && yarn run lint:solidity",
     "lint:all:fix": "yarn run lint:typescript:fix && yarn run lint:solidity:fix",
-    "test": "REPORT_GAS=true npx hardhat test"
+    "test": "REPORT_GAS=true npx hardhat test",
+    "deploy:local": "npx hardhat run scripts/local.ts --network local"
   },
   "devDependencies": {
     "@chainsafe/eslint-config": "^2.1.1",

@@ -109,7 +109,7 @@ contract SpectreProxy is AccessControl {
 
         stateRoots[sourceDomainID][input.finalizedSlot] = stateRoot;
         emit StateRootSubmitted(sourceDomainID, input.finalizedSlot, stateRoot);
-
+        
     }
 
     /**

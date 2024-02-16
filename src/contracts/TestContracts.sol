@@ -247,12 +247,16 @@ contract TestSpectre {
 
 contract StateRootStorage {
     mapping(uint8 => mapping(uint256 => bytes32)) public _stateRoots;
+    
+    event StateRootSubmitted(uint8 sourceDomainID, uint256 slot, bytes32 stateRoot);
 
-    function getStateRoot(uint8 domainID, uint256 blockNumber) public view returns (bytes32) {
-        return _stateRoots[domainID][blockNumber];
+    function getStateRoot(uint8 domainID, uint256 slot) public view returns (bytes32) {
+        return _stateRoots[domainID][slot];
     }
 
-    function storeStateRoot(uint8 domainID, uint256 blockNumber, bytes32 stateRoot) public {
-        _stateRoots[domainID][blockNumber] = stateRoot;
+    function storeStateRoot(uint8 domainID, uint256 slot, bytes32 stateRoot) public {
+        _stateRoots[domainID][slot] = stateRoot;
+
+        emit StateRootSubmitted(domainID, slot, stateRoot);
     }
 }

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 
 import { ethers, network } from "hardhat";
-import type { TransactionReceipt, TransactionResponse } from "ethers";
+import { type TransactionReceipt, type TransactionResponse } from "ethers";
 import { generateAccessControlFuncSignatures } from "../scripts/utils";
 import type {
   Bridge,
@@ -105,7 +105,7 @@ export const accessControlFuncSignatures = generateAccessControlFuncSignatures(
 
 export async function deployBridgeContracts(
   domainID: number,
-  routerAddress: string,
+  routerAddress?: string,
 ): Promise<[Bridge, Router, Executor, StateRootStorage]> {
   const securityModel = 1;
   const [adminAccount] = await ethers.getSigners();
@@ -136,11 +136,13 @@ export async function deployBridgeContracts(
     await bridgeInstance.getAddress(),
     await accessControlInstance.getAddress(),
   );
-  await executorInstance.adminChangeRouter(
-    // mock that the origin domain the is different than executor domainID
-    domainID == 1 ? 2 : 1,
-    routerAddress,
-  );
+  if (routerAddress)
+    await executorInstance.adminChangeRouter(
+      // mock that the origin domain is different than executor domainID
+      domainID == 1 ? 2 : 1,
+      routerAddress,
+    );
+
   // depending on domainID value, set source domain IDs slot index to 2
   await executorInstance.adminChangeSlotIndex(domainID == 1 ? 2 : 1, 2);
 
