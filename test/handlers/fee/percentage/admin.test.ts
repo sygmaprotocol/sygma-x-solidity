@@ -17,6 +17,7 @@ describe("PercentageFeeHandler - [admin]", () => {
   const originDomainID = 1;
   const destinationDomainID = 1;
   const routerAddress = "0x1a60efB48c61A79515B170CA61C84DD6dCA80418";
+  const securityModel = 1;
 
   let bridgeInstance: Bridge;
   let routerInstance: Router;
@@ -67,21 +68,24 @@ describe("PercentageFeeHandler - [admin]", () => {
   it("should set fee property", async () => {
     const fee = 60000;
     assert.deepEqual(
-      await percentageFeeHandlerInstance._domainResourceIDToFee(
+      await percentageFeeHandlerInstance._domainResourceIDSecurityModelToFee(
         destinationDomainID,
         resourceID,
+        securityModel,
       ),
       BigInt(0),
     );
     await percentageFeeHandlerInstance.changeFee(
       destinationDomainID,
       resourceID,
+      securityModel,
       fee,
     );
     assert.deepEqual(
-      await percentageFeeHandlerInstance._domainResourceIDToFee(
+      await percentageFeeHandlerInstance._domainResourceIDSecurityModelToFee(
         destinationDomainID,
         resourceID,
+        securityModel,
       ),
       BigInt(fee),
     );
@@ -92,7 +96,7 @@ describe("PercentageFeeHandler - [admin]", () => {
     await expect(
       percentageFeeHandlerInstance
         .connect(nonAdminAccount)
-        .changeFee(destinationDomainID, resourceID, fee),
+        .changeFee(destinationDomainID, resourceID, securityModel, fee),
     ).to.be.revertedWith("sender doesn't have admin role");
   });
 

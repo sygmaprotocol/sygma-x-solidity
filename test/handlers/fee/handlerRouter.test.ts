@@ -21,6 +21,7 @@ describe("FeeHandlerRouter", () => {
   const destinationDomainID = 2;
   const feeData = "0x";
   const routerAddress = "0x1a60efB48c61A79515B170CA61C84DD6dCA80418";
+  const securityModel = 1;
 
   let routerInstance: Router;
   let ERC20MintableInstance: ERC20PresetMinterPauser;
@@ -75,21 +76,24 @@ describe("FeeHandlerRouter", () => {
 
   it("should successfully set handler to resourceID", async () => {
     assert.deepEqual(
-      await feeHandlerRouterInstance._domainResourceIDToFeeHandlerAddress(
+      await feeHandlerRouterInstance._domainResourceIDSecurityModelToFeeHandlerAddress(
         destinationDomainID,
         resourceID,
+        securityModel,
       ),
       "0x0000000000000000000000000000000000000000",
     );
     await feeHandlerRouterInstance.adminSetResourceHandler(
       destinationDomainID,
       resourceID,
+      securityModel,
       feeHandlerAccount.getAddress(),
     );
     const newFeeHandler =
-      await feeHandlerRouterInstance._domainResourceIDToFeeHandlerAddress(
+      await feeHandlerRouterInstance._domainResourceIDSecurityModelToFeeHandlerAddress(
         destinationDomainID,
         resourceID,
+        securityModel,
       );
     assert.deepEqual(newFeeHandler, await feeHandlerAccount.getAddress());
   });
@@ -101,6 +105,7 @@ describe("FeeHandlerRouter", () => {
         .adminSetResourceHandler(
           destinationDomainID,
           resourceID,
+          securityModel,
           feeHandlerAccount.getAddress(),
         ),
     ).to.be.revertedWith("sender doesn't have admin role");
@@ -145,11 +150,13 @@ describe("FeeHandlerRouter", () => {
     await feeHandlerRouterInstance.adminSetResourceHandler(
       destinationDomainID,
       resourceID,
+      securityModel,
       await basicFeeHandlerInstance.getAddress(),
     );
     await basicFeeHandlerInstance.changeFee(
       destinationDomainID,
       resourceID,
+      securityModel,
       ethers.parseEther("0.5"),
     );
 
@@ -163,6 +170,7 @@ describe("FeeHandlerRouter", () => {
       originDomainID,
       destinationDomainID,
       resourceID,
+      securityModel,
       depositData,
       feeData,
     );
@@ -172,6 +180,7 @@ describe("FeeHandlerRouter", () => {
       originDomainID,
       destinationDomainID,
       resourceID,
+      securityModel,
       depositData,
       feeData,
     );
@@ -186,11 +195,13 @@ describe("FeeHandlerRouter", () => {
     await feeHandlerRouterInstance.adminSetResourceHandler(
       destinationDomainID,
       resourceID,
+      securityModel,
       await basicFeeHandlerInstance.getAddress(),
     );
     await basicFeeHandlerInstance.changeFee(
       destinationDomainID,
       resourceID,
+      securityModel,
       ethers.parseEther("0.5"),
     );
 
@@ -207,6 +218,7 @@ describe("FeeHandlerRouter", () => {
           originDomainID,
           destinationDomainID,
           resourceID,
+          securityModel,
           depositData,
           feeData,
           {
@@ -226,6 +238,7 @@ describe("FeeHandlerRouter", () => {
           originDomainID,
           destinationDomainID,
           resourceID,
+          securityModel,
           depositData,
           feeData,
           {
@@ -243,11 +256,13 @@ describe("FeeHandlerRouter", () => {
     await feeHandlerRouterInstance.adminSetResourceHandler(
       destinationDomainID,
       resourceID,
+      securityModel,
       await basicFeeHandlerInstance.getAddress(),
     );
     await basicFeeHandlerInstance.changeFee(
       destinationDomainID,
       resourceID,
+      securityModel,
       ethers.parseEther("0.5"),
     );
 
@@ -264,6 +279,7 @@ describe("FeeHandlerRouter", () => {
           originDomainID,
           destinationDomainID,
           resourceID,
+          securityModel,
           depositData,
           feeData,
           {

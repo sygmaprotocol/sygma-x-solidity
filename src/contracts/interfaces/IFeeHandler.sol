@@ -47,6 +47,7 @@ interface IFeeHandler {
         uint8 fromDomainID,
         uint8 destinationDomainID,
         bytes32 resourceID,
+        uint8 securityModel,
         bytes calldata depositData,
         bytes calldata feeData
     ) external payable;
@@ -67,6 +68,7 @@ interface IFeeHandler {
         uint8 fromDomainID,
         uint8 destinationDomainID,
         bytes32 resourceID,
+        uint8 securityModel,
         bytes calldata depositData,
         bytes calldata feeData
     ) external view returns (uint256, address);

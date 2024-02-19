@@ -13,6 +13,7 @@ import type {
   BasicFeeHandler,
   Bridge,
   Router,
+  Executor,
   ERC20Handler,
   ERC20PresetMinterPauser,
   FeeHandlerRouter,
@@ -111,13 +112,15 @@ describe("BasicFeeHandler - [distributeFee]", () => {
     await basicFeeHandlerInstance.changeFee(
       destinationDomainID,
       resourceID,
+      securityModel,
       ethers.parseEther("1.0"),
     );
     assert.deepEqual(
       ethers.formatEther(
-        await basicFeeHandlerInstance._domainResourceIDToFee(
+        await basicFeeHandlerInstance._domainResourceIDSecurityModelToFee(
           destinationDomainID,
           resourceID,
+          securityModel,
         ),
       ),
       "1.0",
@@ -205,6 +208,7 @@ describe("BasicFeeHandler - [distributeFee]", () => {
     await basicFeeHandlerInstance.changeFee(
       destinationDomainID,
       resourceID,
+      securityModel,
       ethers.parseEther("1.0"),
     );
 
@@ -249,6 +253,7 @@ describe("BasicFeeHandler - [distributeFee]", () => {
     await basicFeeHandlerInstance.changeFee(
       destinationDomainID,
       resourceID,
+      securityModel,
       ethers.parseEther("1.0"),
     );
 

@@ -85,6 +85,7 @@ describe("PercentageFeeHandler - [collectFee]", () => {
     await percentageFeeHandlerInstance.changeFee(
       destinationDomainID,
       resourceID,
+      securityModel,
       feeBps,
     );
     await percentageFeeHandlerInstance.changeFeeBounds(
@@ -115,6 +116,7 @@ describe("PercentageFeeHandler - [collectFee]", () => {
       feeHandlerRouterInstance.adminSetResourceHandler(
         destinationDomainID,
         resourceID,
+        securityModel,
         await percentageFeeHandlerInstance.getAddress(),
       ),
     ]);
@@ -229,6 +231,7 @@ describe("PercentageFeeHandler - [collectFee]", () => {
           originDomainID,
           destinationDomainID,
           resourceID,
+          securityModel,
           depositData,
           feeData,
           {
@@ -256,6 +259,7 @@ describe("PercentageFeeHandler - [collectFee]", () => {
           originDomainID,
           destinationDomainID,
           resourceID,
+          securityModel,
           depositData,
           feeData,
           {
