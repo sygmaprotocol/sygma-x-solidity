@@ -100,6 +100,49 @@ describe("BasicFeeHandler - [admin]", () => {
     );
   });
 
+  it("should set fee properties for different security models", async () => {
+    const fee = 3;
+    const secondFee = 5;
+    const secondSecurityModel = 2;
+
+    assert.deepEqual(
+      await basicFeeHandlerInstance._domainResourceIDSecurityModelToFee(
+        destinationDomainID,
+        resourceID,
+        securityModel,
+      ),
+      BigInt(0),
+    );
+    await basicFeeHandlerInstance.changeFee(
+      destinationDomainID,
+      resourceID,
+      securityModel,
+      fee,
+    );
+    await basicFeeHandlerInstance.changeFee(
+      destinationDomainID,
+      resourceID,
+      secondSecurityModel,
+      secondFee,
+    );
+    assert.deepEqual(
+      await basicFeeHandlerInstance._domainResourceIDSecurityModelToFee(
+        destinationDomainID,
+        resourceID,
+        securityModel,
+      ),
+      BigInt(fee),
+    );
+    assert.deepEqual(
+      await basicFeeHandlerInstance._domainResourceIDSecurityModelToFee(
+        destinationDomainID,
+        resourceID,
+        secondSecurityModel,
+      ),
+      BigInt(secondFee),
+    );
+  });
+
   it("should require admin role to change fee property", async () => {
     const fee = 3;
     await expect(

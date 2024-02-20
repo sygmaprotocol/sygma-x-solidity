@@ -67,6 +67,49 @@ describe("PercentageFeeHandler - [admin]", () => {
 
   it("should set fee property", async () => {
     const fee = 60000;
+    const secondFee = 10000;
+    const secondSecurityModel = 2;
+
+    assert.deepEqual(
+      await percentageFeeHandlerInstance._domainResourceIDSecurityModelToFee(
+        destinationDomainID,
+        resourceID,
+        securityModel,
+      ),
+      BigInt(0),
+    );
+    await percentageFeeHandlerInstance.changeFee(
+      destinationDomainID,
+      resourceID,
+      securityModel,
+      fee,
+    );
+    await percentageFeeHandlerInstance.changeFee(
+      destinationDomainID,
+      resourceID,
+      secondSecurityModel,
+      secondFee,
+    );
+    assert.deepEqual(
+      await percentageFeeHandlerInstance._domainResourceIDSecurityModelToFee(
+        destinationDomainID,
+        resourceID,
+        securityModel,
+      ),
+      BigInt(fee),
+    );
+    assert.deepEqual(
+      await percentageFeeHandlerInstance._domainResourceIDSecurityModelToFee(
+        destinationDomainID,
+        resourceID,
+        secondSecurityModel,
+      ),
+      BigInt(secondFee),
+    );
+  });
+
+  it("should set fee properties for different security models", async () => {
+    const fee = 60000;
     assert.deepEqual(
       await percentageFeeHandlerInstance._domainResourceIDSecurityModelToFee(
         destinationDomainID,
