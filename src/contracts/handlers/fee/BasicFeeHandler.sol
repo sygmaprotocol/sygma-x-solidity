@@ -15,7 +15,8 @@ contract BasicFeeHandler is IFeeHandler, AccessControl {
     address public immutable _bridgeAddress;
     address public immutable _feeHandlerRouterAddress;
     address public immutable _routerAddress;
-    mapping (uint8 => mapping(bytes32 => uint256)) public _domainResourceIDToFee;
+    // domainID => resourceID => securityModel => fee
+    mapping (uint8 => mapping(bytes32 => mapping(uint8 => uint256))) public _domainResourceIDSecurityModelToFee;
 
 
     event FeeChanged(uint256 newFee);
@@ -70,6 +71,7 @@ contract BasicFeeHandler is IFeeHandler, AccessControl {
         @param fromDomainID ID of the source chain.
         @param destinationDomainID ID of chain deposit will be bridged to.
         @param resourceID ResourceID to be used when making deposits.
+        @param securityModel Security model to be used when making deposits.
         @param depositData Additional data to be passed to specified handler.
         @param feeData Additional data to be passed to the fee handler.
      */
@@ -78,10 +80,11 @@ contract BasicFeeHandler is IFeeHandler, AccessControl {
         uint8 fromDomainID,
         uint8 destinationDomainID,
         bytes32 resourceID,
+        uint8 securityModel,
         bytes calldata depositData,
         bytes calldata feeData
-    ) external virtual payable  onlyBridgeOrRouter {
-        uint256 currentFee = _domainResourceIDToFee[destinationDomainID][resourceID];
+    ) external virtual payable onlyBridgeOrRouter {
+        uint256 currentFee = _domainResourceIDSecurityModelToFee[destinationDomainID][resourceID][securityModel];
         if (msg.value != currentFee) revert IncorrectFeeSupplied(msg.value);
         emit FeeCollected(sender, fromDomainID, destinationDomainID, resourceID, currentFee, address(0));
     }
@@ -92,6 +95,7 @@ contract BasicFeeHandler is IFeeHandler, AccessControl {
         @param fromDomainID ID of the source chain.
         @param destinationDomainID ID of chain deposit will be bridged to.
         @param resourceID ResourceID to be used when making deposits.
+        @param securityModel Security model to be used when making deposits.
         @param depositData Additional data to be passed to specified handler.
         @param feeData Additional data to be passed to the fee handler.
         @return Returns the fee amount.
@@ -101,23 +105,31 @@ contract BasicFeeHandler is IFeeHandler, AccessControl {
         uint8 fromDomainID,
         uint8 destinationDomainID,
         bytes32 resourceID,
+        uint8 securityModel,
         bytes calldata depositData,
         bytes calldata feeData
     ) virtual external  view returns(uint256, address) {
-        return (_domainResourceIDToFee[destinationDomainID][resourceID], address(0));
+        return (_domainResourceIDSecurityModelToFee[destinationDomainID][resourceID][securityModel], address(0));
     }
 
     /**
-        @notice Maps the {newFee} to {destinantionDomainID} to {resourceID} in {_domainResourceIDToFee}.
+        @notice Maps the {newFee} to {destinantionDomainID} to {resourceID} to
+        {securityModel} in {_domainResourceIDSecurityModelToFee}.
         @notice Only callable by admin.
         @param destinationDomainID ID of chain fee will be set.
         @param resourceID ResourceID for which fee will be set.
+        @param securityModel securityModel for which fee will be set.
         @param newFee Value to which fee will be updated to for the provided {destinantionDomainID} and {resourceID}.
      */
-    function changeFee(uint8 destinationDomainID, bytes32 resourceID, uint256 newFee) external onlyAdmin {
-        uint256 currentFee = _domainResourceIDToFee[destinationDomainID][resourceID];
+    function changeFee(
+            uint8 destinationDomainID,
+            bytes32 resourceID,
+            uint8 securityModel,
+            uint256 newFee
+        ) external onlyAdmin {
+        uint256 currentFee = _domainResourceIDSecurityModelToFee[destinationDomainID][resourceID][securityModel];
         require(currentFee != newFee, "Current fee is equal to new fee");
-        _domainResourceIDToFee[destinationDomainID][resourceID] = newFee;
+        _domainResourceIDSecurityModelToFee[destinationDomainID][resourceID][securityModel] = newFee;
         emit FeeChanged(newFee);
     }
 

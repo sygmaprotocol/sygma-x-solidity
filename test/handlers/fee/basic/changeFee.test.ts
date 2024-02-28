@@ -17,6 +17,7 @@ describe("BasicFeeHandler - [changeFee]", () => {
   const originDomainID = 1;
   const destinationDomainID = 2;
   const routerAddress = "0x1a60efB48c61A79515B170CA61C84DD6dCA80418";
+  const securityModel = 1;
 
   let bridgeInstance: Bridge;
   let routerInstance: Router;
@@ -80,6 +81,7 @@ describe("BasicFeeHandler - [changeFee]", () => {
     const changeFeeTx = await basicFeeHandlerInstance.changeFee(
       destinationDomainID,
       resourceID,
+      securityModel,
       fee,
     );
 
@@ -87,16 +89,23 @@ describe("BasicFeeHandler - [changeFee]", () => {
       .to.emit(basicFeeHandlerInstance, "FeeChanged")
       .withArgs(ethers.parseEther("0.05"));
 
-    const newFee = await basicFeeHandlerInstance._domainResourceIDToFee(
-      destinationDomainID,
-      resourceID,
-    );
+    const newFee =
+      await basicFeeHandlerInstance._domainResourceIDSecurityModelToFee(
+        destinationDomainID,
+        resourceID,
+        securityModel,
+      );
     assert.deepEqual(ethers.formatEther(newFee), "0.05");
   });
 
   it("should not set the same fee", async () => {
     await expect(
-      basicFeeHandlerInstance.changeFee(destinationDomainID, resourceID, 0),
+      basicFeeHandlerInstance.changeFee(
+        destinationDomainID,
+        resourceID,
+        securityModel,
+        0,
+      ),
     ).to.be.rejectedWith("Current fee is equal to new fee");
   });
 
@@ -104,7 +113,7 @@ describe("BasicFeeHandler - [changeFee]", () => {
     await expect(
       basicFeeHandlerInstance
         .connect(nonAdminAccount)
-        .changeFee(destinationDomainID, resourceID, 1),
+        .changeFee(destinationDomainID, resourceID, securityModel, 1),
     ).to.be.revertedWith("sender doesn't have admin role");
   });
 });

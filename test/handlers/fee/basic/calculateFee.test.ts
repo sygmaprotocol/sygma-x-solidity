@@ -26,6 +26,7 @@ describe("BasicFeeHandler - [calculateFee]", () => {
   const feeData = "0x";
   const emptySetResourceData = "0x";
   const routerAddress = "0x1a60efB48c61A79515B170CA61C84DD6dCA80418";
+  const securityModel = 1;
 
   let bridgeInstance: Bridge;
   let routerInstance: Router;
@@ -93,6 +94,7 @@ describe("BasicFeeHandler - [calculateFee]", () => {
       feeHandlerRouterInstance.adminSetResourceHandler(
         destinationDomainID,
         resourceID,
+        securityModel,
         basicFeeHandlerInstance.getAddress(),
       ),
     ]);
@@ -105,6 +107,7 @@ describe("BasicFeeHandler - [calculateFee]", () => {
       originDomainID,
       destinationDomainID,
       resourceID,
+      securityModel,
       depositData,
       feeData,
     );
@@ -114,6 +117,7 @@ describe("BasicFeeHandler - [calculateFee]", () => {
     await basicFeeHandlerInstance.changeFee(
       destinationDomainID,
       resourceID,
+      securityModel,
       ethers.parseEther("0.5"),
     );
     const response2 = await feeHandlerRouterInstance.calculateFee(
@@ -121,6 +125,7 @@ describe("BasicFeeHandler - [calculateFee]", () => {
       originDomainID,
       destinationDomainID,
       resourceID,
+      securityModel,
       depositData,
       feeData,
     );

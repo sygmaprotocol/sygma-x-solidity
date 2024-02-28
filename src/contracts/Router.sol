@@ -104,6 +104,7 @@ contract Router is Context {
                 _domainID,
                 destinationDomainID,
                 resourceID,
+                securityModel,
                 depositData,
                 feeData
             );

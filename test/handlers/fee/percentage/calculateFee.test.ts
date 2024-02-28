@@ -24,6 +24,7 @@ describe("PercentageFeeHandler - [calculateFee]", () => {
   const feeData = "0x";
   const emptySetResourceData = "0x";
   const routerAddress = "0x1a60efB48c61A79515B170CA61C84DD6dCA80418";
+  const securityModel = 1;
 
   let bridgeInstance: Bridge;
   let routerInstance: Router;
@@ -85,6 +86,7 @@ describe("PercentageFeeHandler - [calculateFee]", () => {
       feeHandlerRouterInstance.adminSetResourceHandler(
         destinationDomainID,
         resourceID,
+        securityModel,
         percentageFeeHandlerInstance.getAddress(),
       ),
     ]);
@@ -104,6 +106,7 @@ describe("PercentageFeeHandler - [calculateFee]", () => {
       originDomainID,
       destinationDomainID,
       resourceID,
+      securityModel,
       depositData,
       feeData,
     );
@@ -113,6 +116,7 @@ describe("PercentageFeeHandler - [calculateFee]", () => {
     await percentageFeeHandlerInstance.changeFee(
       destinationDomainID,
       resourceID,
+      securityModel,
       10000,
     );
     await percentageFeeHandlerInstance.changeFeeBounds(resourceID, 100, 300000);
@@ -121,6 +125,7 @@ describe("PercentageFeeHandler - [calculateFee]", () => {
       originDomainID,
       destinationDomainID,
       resourceID,
+      securityModel,
       depositData,
       feeData,
     );
@@ -141,6 +146,7 @@ describe("PercentageFeeHandler - [calculateFee]", () => {
       originDomainID,
       destinationDomainID,
       resourceID,
+      securityModel,
       depositData,
       feeData,
     );
@@ -150,6 +156,7 @@ describe("PercentageFeeHandler - [calculateFee]", () => {
     await percentageFeeHandlerInstance.changeFee(
       destinationDomainID,
       resourceID,
+      securityModel,
       10000,
     );
     const response2 = await feeHandlerRouterInstance.calculateFee(
@@ -157,6 +164,7 @@ describe("PercentageFeeHandler - [calculateFee]", () => {
       originDomainID,
       destinationDomainID,
       resourceID,
+      securityModel,
       depositData,
       feeData,
     );
@@ -173,6 +181,7 @@ describe("PercentageFeeHandler - [calculateFee]", () => {
     await percentageFeeHandlerInstance.changeFee(
       destinationDomainID,
       resourceID,
+      securityModel,
       10000,
     );
 
@@ -181,6 +190,7 @@ describe("PercentageFeeHandler - [calculateFee]", () => {
       originDomainID,
       destinationDomainID,
       resourceID,
+      securityModel,
       depositData,
       feeData,
     );
@@ -197,6 +207,7 @@ describe("PercentageFeeHandler - [calculateFee]", () => {
     await percentageFeeHandlerInstance.changeFee(
       destinationDomainID,
       resourceID,
+      securityModel,
       10000,
     );
 
@@ -205,6 +216,7 @@ describe("PercentageFeeHandler - [calculateFee]", () => {
       originDomainID,
       destinationDomainID,
       resourceID,
+      securityModel,
       depositData,
       feeData,
     );
@@ -221,6 +233,7 @@ describe("PercentageFeeHandler - [calculateFee]", () => {
     await percentageFeeHandlerInstance.changeFee(
       destinationDomainID,
       resourceID,
+      securityModel,
       10000,
     );
 
@@ -229,6 +242,7 @@ describe("PercentageFeeHandler - [calculateFee]", () => {
       originDomainID,
       destinationDomainID,
       resourceID,
+      securityModel,
       depositData,
       feeData,
     );
@@ -245,6 +259,7 @@ describe("PercentageFeeHandler - [calculateFee]", () => {
     await percentageFeeHandlerInstance.changeFee(
       destinationDomainID,
       resourceID,
+      securityModel,
       10000,
     );
 
@@ -253,6 +268,7 @@ describe("PercentageFeeHandler - [calculateFee]", () => {
       originDomainID,
       destinationDomainID,
       resourceID,
+      securityModel,
       depositData,
       feeData,
     );

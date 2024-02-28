@@ -18,6 +18,7 @@ describe("PercentageFeeHandler - [change fee and bounds]", () => {
   const originDomainID = 1;
   const destinationDomainID = 1;
   const routerAddress = "0x1a60efB48c61A79515B170CA61C84DD6dCA80418";
+  const securityModel = 1;
 
   let bridgeInstance: Bridge;
   let routerInstance: Router;
@@ -68,16 +69,19 @@ describe("PercentageFeeHandler - [change fee and bounds]", () => {
     const changeFeeTx = await percentageFeeHandlerInstance.changeFee(
       destinationDomainID,
       resourceID,
+      securityModel,
       fee,
     );
 
     await expect(changeFeeTx)
       .to.emit(percentageFeeHandlerInstance, "FeeChanged")
       .withArgs(BigInt(fee));
-    const newFee = await percentageFeeHandlerInstance._domainResourceIDToFee(
-      destinationDomainID,
-      resourceID,
-    );
+    const newFee =
+      await percentageFeeHandlerInstance._domainResourceIDSecurityModelToFee(
+        destinationDomainID,
+        resourceID,
+        securityModel,
+      );
     assert.deepEqual(ethers.formatUnits(newFee), "25.0");
   });
 
@@ -86,6 +90,7 @@ describe("PercentageFeeHandler - [change fee and bounds]", () => {
       percentageFeeHandlerInstance.changeFee(
         destinationDomainID,
         resourceID,
+        securityModel,
         0,
       ),
     ).to.be.revertedWith("Current fee is equal to new fee");
@@ -95,7 +100,7 @@ describe("PercentageFeeHandler - [change fee and bounds]", () => {
     await expect(
       percentageFeeHandlerInstance
         .connect(nonAdminAddress)
-        .changeFee(destinationDomainID, resourceID, 1),
+        .changeFee(destinationDomainID, resourceID, securityModel, 1),
     ).to.be.revertedWith("sender doesn't have admin role");
   });
 

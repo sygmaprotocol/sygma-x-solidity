@@ -92,6 +92,7 @@ describe("BasicFeeHandler - [collectFee]", () => {
       feeHandlerRouterInstance.adminSetResourceHandler(
         destinationDomainID,
         erc20ResourceID,
+        securityModel,
         await basicFeeHandlerInstance.getAddress(),
       ),
     ]);
@@ -120,9 +121,10 @@ describe("BasicFeeHandler - [collectFee]", () => {
   it("deposit should revert if invalid fee amount supplied", async () => {
     // current fee is set to 0
     assert.deepEqual(
-      await basicFeeHandlerInstance._domainResourceIDToFee(
+      await basicFeeHandlerInstance._domainResourceIDSecurityModelToFee(
         destinationDomainID,
         erc20ResourceID,
+        securityModel,
       ),
       BigInt(0),
     );
@@ -153,9 +155,10 @@ describe("BasicFeeHandler - [collectFee]", () => {
     const fee = ethers.parseEther("0.5");
     // current fee is set to 0
     assert.deepEqual(
-      await basicFeeHandlerInstance._domainResourceIDToFee(
+      await basicFeeHandlerInstance._domainResourceIDSecurityModelToFee(
         destinationDomainID,
         erc20ResourceID,
+        securityModel,
       ),
       BigInt(0),
     );
@@ -163,13 +166,15 @@ describe("BasicFeeHandler - [collectFee]", () => {
     await basicFeeHandlerInstance.changeFee(
       destinationDomainID,
       erc20ResourceID,
+      securityModel,
       fee,
     );
     assert.deepEqual(
       ethers.formatEther(
-        await basicFeeHandlerInstance._domainResourceIDToFee(
+        await basicFeeHandlerInstance._domainResourceIDSecurityModelToFee(
           destinationDomainID,
           erc20ResourceID,
+          securityModel,
         ),
       ),
       "0.5",
@@ -265,9 +270,10 @@ describe("BasicFeeHandler - [collectFee]", () => {
     );
     // current fee is set to 0
     assert.deepEqual(
-      await basicFeeHandlerInstance._domainResourceIDToFee(
+      await basicFeeHandlerInstance._domainResourceIDSecurityModelToFee(
         destinationDomainID,
         erc20ResourceID,
+        securityModel,
       ),
       BigInt(0),
     );
@@ -275,13 +281,15 @@ describe("BasicFeeHandler - [collectFee]", () => {
     await basicFeeHandlerInstance.changeFee(
       destinationDomainID,
       erc20ResourceID,
+      securityModel,
       fee,
     );
     assert.deepEqual(
       ethers.formatEther(
-        await basicFeeHandlerInstance._domainResourceIDToFee(
+        await basicFeeHandlerInstance._domainResourceIDSecurityModelToFee(
           destinationDomainID,
           erc20ResourceID,
+          securityModel,
         ),
       ),
       "0.5",
@@ -299,6 +307,7 @@ describe("BasicFeeHandler - [collectFee]", () => {
           originDomainID,
           destinationDomainID,
           erc20ResourceID,
+          securityModel,
           erc20depositData,
           feeData,
           {
@@ -320,9 +329,10 @@ describe("BasicFeeHandler - [collectFee]", () => {
     );
     // current fee is set to 0
     assert.deepEqual(
-      await basicFeeHandlerInstance._domainResourceIDToFee(
+      await basicFeeHandlerInstance._domainResourceIDSecurityModelToFee(
         destinationDomainID,
         erc20ResourceID,
+        securityModel,
       ),
       BigInt(0),
     );
@@ -330,13 +340,15 @@ describe("BasicFeeHandler - [collectFee]", () => {
     await basicFeeHandlerInstance.changeFee(
       destinationDomainID,
       erc20ResourceID,
+      securityModel,
       fee,
     );
     assert.deepEqual(
       ethers.formatEther(
-        await basicFeeHandlerInstance._domainResourceIDToFee(
+        await basicFeeHandlerInstance._domainResourceIDSecurityModelToFee(
           destinationDomainID,
           erc20ResourceID,
+          securityModel,
         ),
       ),
       "0.5",
@@ -354,6 +366,7 @@ describe("BasicFeeHandler - [collectFee]", () => {
           originDomainID,
           destinationDomainID,
           erc20ResourceID,
+          securityModel,
           erc20depositData,
           feeData,
           {
@@ -376,9 +389,10 @@ describe("BasicFeeHandler - [collectFee]", () => {
     const fee = ethers.parseEther("0.5");
     // current fee is set to 0
     assert.deepEqual(
-      await basicFeeHandlerInstance._domainResourceIDToFee(
+      await basicFeeHandlerInstance._domainResourceIDSecurityModelToFee(
         destinationDomainID,
         erc20ResourceID,
+        securityModel,
       ),
       BigInt(0),
     );
@@ -386,13 +400,15 @@ describe("BasicFeeHandler - [collectFee]", () => {
     await basicFeeHandlerInstance.changeFee(
       destinationDomainID,
       erc20ResourceID,
+      securityModel,
       fee,
     );
     assert.deepEqual(
       ethers.formatEther(
-        await basicFeeHandlerInstance._domainResourceIDToFee(
+        await basicFeeHandlerInstance._domainResourceIDSecurityModelToFee(
           destinationDomainID,
           erc20ResourceID,
+          securityModel,
         ),
       ),
       "0.5",

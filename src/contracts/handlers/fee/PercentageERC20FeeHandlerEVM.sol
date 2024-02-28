@@ -16,8 +16,8 @@ contract PercentageERC20FeeHandlerEVM is BasicFeeHandler, ERC20Safe {
     uint32 public constant HUNDRED_PERCENT = 1e8;
 
     /**
-        @notice _domainResourceIDToFee[destinationDomainID][resourceID] inherited from
-        BasicFeeHandler in this implementation is in BPS and should be multiplied by
+        @notice _domainResourceIDSecurityModelToFee[destinationDomainID][resourceID][securityModel]
+        inherited from BasicFeeHandler in this implementation is in BPS and should be multiplied by
         10000 to avoid precision loss
      */
     struct Bounds {
@@ -47,6 +47,7 @@ contract PercentageERC20FeeHandlerEVM is BasicFeeHandler, ERC20Safe {
         @param fromDomainID ID of the source chain.
         @param destinationDomainID ID of chain deposit will be bridged to.
         @param resourceID ResourceID to be used when making deposits.
+        @param securityModel Security model to be used when making deposits.
         @param depositData Additional data about the deposit.
         @param feeData Additional data to be passed to the fee handler.
         @return fee Returns the fee amount.
@@ -57,10 +58,19 @@ contract PercentageERC20FeeHandlerEVM is BasicFeeHandler, ERC20Safe {
         uint8 fromDomainID,
         uint8 destinationDomainID,
         bytes32 resourceID,
+        uint8 securityModel,
         bytes calldata depositData,
         bytes calldata feeData
     ) external view override returns (uint256 fee, address tokenAddress) {
-        return _calculateFee(sender, fromDomainID, destinationDomainID, resourceID, depositData, feeData);
+        return _calculateFee(
+            sender,
+            fromDomainID,
+            destinationDomainID,
+            resourceID,
+            securityModel,
+            depositData,
+            feeData
+        );
     }
 
     function _calculateFee(
@@ -68,6 +78,7 @@ contract PercentageERC20FeeHandlerEVM is BasicFeeHandler, ERC20Safe {
         uint8 fromDomainID,
         uint8 destinationDomainID,
         bytes32 resourceID,
+        uint8 securityModel,
         bytes calldata depositData,
         bytes calldata feeData
     ) internal view returns (uint256 fee, address tokenAddress) {
@@ -78,7 +89,8 @@ contract PercentageERC20FeeHandlerEVM is BasicFeeHandler, ERC20Safe {
         uint256 depositAmount = abi.decode(depositData, (uint256));
 
         // 10000 for BPS and 10000 to avoid precision loss
-        fee = depositAmount * _domainResourceIDToFee[destinationDomainID][resourceID] / HUNDRED_PERCENT;
+        fee = depositAmount * _domainResourceIDSecurityModelToFee[
+            destinationDomainID][resourceID][securityModel] / HUNDRED_PERCENT;
 
         if (fee < bounds.lowerBound) {
             fee = bounds.lowerBound;
@@ -97,6 +109,7 @@ contract PercentageERC20FeeHandlerEVM is BasicFeeHandler, ERC20Safe {
         @param fromDomainID ID of the source chain.
         @param destinationDomainID ID of chain deposit will be bridged to.
         @param resourceID ResourceID to be used when making deposits.
+        @param securityModel Security model to be used when making deposits.
         @param depositData Additional data about the deposit.
         @param feeData Additional data to be passed to the fee handler.
      */
@@ -105,6 +118,7 @@ contract PercentageERC20FeeHandlerEVM is BasicFeeHandler, ERC20Safe {
         uint8 fromDomainID,
         uint8 destinationDomainID,
         bytes32 resourceID,
+        uint8 securityModel,
         bytes calldata depositData,
         bytes calldata feeData
     ) external payable override onlyBridgeOrRouter {
@@ -115,6 +129,7 @@ contract PercentageERC20FeeHandlerEVM is BasicFeeHandler, ERC20Safe {
             fromDomainID,
             destinationDomainID,
             resourceID,
+            securityModel,
             depositData,
             feeData
         );
