@@ -113,11 +113,13 @@ describe("PercentageFeeHandler - [distributeFee]", () => {
       feeHandlerRouterInstance.adminSetResourceHandler(
         destinationDomainID,
         resourceID,
+        securityModel,
         await percentageFeeHandlerInstance.getAddress(),
       ),
       percentageFeeHandlerInstance.changeFee(
         destinationDomainID,
         resourceID,
+        securityModel,
         feeBps,
       ),
     ]);

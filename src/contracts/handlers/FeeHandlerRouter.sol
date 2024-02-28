@@ -13,8 +13,9 @@ import "../utils/AccessControl.sol";
 contract FeeHandlerRouter is IFeeHandler, AccessControl {
     address public immutable _routerAddress;
 
-    // destination domainID => resourceID => feeHandlerAddress
-    mapping(uint8 => mapping(bytes32 => IFeeHandler)) public _domainResourceIDToFeeHandlerAddress;
+    // domainID => resourceID => securityModel => feeHandlerAddress
+    mapping(uint8 => mapping(bytes32 => mapping(uint8 => IFeeHandler))) public
+        _domainResourceIDSecurityModelToFeeHandlerAddress;
     // whitelisted address => is whitelisted
     mapping(address => bool) public _whitelist;
 
@@ -62,18 +63,21 @@ contract FeeHandlerRouter is IFeeHandler, AccessControl {
     }
 
     /**
-        @notice Maps the {handlerAddress} to {resourceID} to
-        {destinantionDomainID} in {_domainResourceIDToFeeHandlerAddress}.
+        @notice Maps the {handlerAddress} to {securityModel} to {resourceID} to
+        {destinantionDomainID} in {_domainResourceIDSecurityModelToFeeHandlerAddress}.
         @param destinationDomainID ID of chain FeeHandler contracts will be called.
         @param resourceID ResourceID for which the corresponding FeeHandler will collect/calcualte fee.
+        @param securityModel Security model for which fee handler address will be set.
         @param handlerAddress Address of FeeHandler which will be called for specified resourceID.
      */
     function adminSetResourceHandler(
         uint8 destinationDomainID,
         bytes32 resourceID,
+        uint8 securityModel,
         IFeeHandler handlerAddress
     ) external onlyAdmin {
-        _domainResourceIDToFeeHandlerAddress[destinationDomainID][resourceID] = handlerAddress;
+        _domainResourceIDSecurityModelToFeeHandlerAddress[destinationDomainID][resourceID][securityModel] =
+            handlerAddress;
     }
 
     /**
@@ -82,6 +86,7 @@ contract FeeHandlerRouter is IFeeHandler, AccessControl {
         @param fromDomainID ID of the source chain.
         @param destinationDomainID ID of chain deposit will be bridged to.
         @param resourceID ResourceID to be used when making deposits.
+        @param securityModel Security model to be used when making deposits.
         @param depositData Additional data to be passed to specified handler.
         @param feeData Additional data to be passed to the fee handler.
      */
@@ -90,6 +95,7 @@ contract FeeHandlerRouter is IFeeHandler, AccessControl {
         uint8 fromDomainID,
         uint8 destinationDomainID,
         bytes32 resourceID,
+        uint8 securityModel,
         bytes calldata depositData,
         bytes calldata feeData
     ) external payable onlyRouter {
@@ -97,12 +103,15 @@ contract FeeHandlerRouter is IFeeHandler, AccessControl {
             if (msg.value != 0) revert IncorrectFeeSupplied(msg.value);
             return;
         }
-        IFeeHandler feeHandler = _domainResourceIDToFeeHandlerAddress[destinationDomainID][resourceID];
+        IFeeHandler feeHandler =
+            _domainResourceIDSecurityModelToFeeHandlerAddress[destinationDomainID][resourceID][securityModel];
+
         feeHandler.collectFee{value: msg.value}(
             sender,
             fromDomainID,
             destinationDomainID,
             resourceID,
+            securityModel,
             depositData,
             feeData
         );
@@ -114,6 +123,7 @@ contract FeeHandlerRouter is IFeeHandler, AccessControl {
         @param fromDomainID ID of the source chain.
         @param destinationDomainID ID of chain deposit will be bridged to.
         @param resourceID ResourceID to be used when making deposits.
+        @param securityModel Security model to be used when making deposits.
         @param depositData Additional data to be passed to specified handler.
         @param feeData Additional data to be passed to the fee handler.
         @return fee Returns the fee amount.
@@ -124,13 +134,24 @@ contract FeeHandlerRouter is IFeeHandler, AccessControl {
         uint8 fromDomainID,
         uint8 destinationDomainID,
         bytes32 resourceID,
+        uint8 securityModel,
         bytes calldata depositData,
         bytes calldata feeData
     ) external view returns (uint256 fee, address tokenAddress) {
         if (_whitelist[sender]) {
             return (0, address(0));
         }
-        IFeeHandler feeHandler = _domainResourceIDToFeeHandlerAddress[destinationDomainID][resourceID];
-        return feeHandler.calculateFee(sender, fromDomainID, destinationDomainID, resourceID, depositData, feeData);
+        IFeeHandler feeHandler =
+            _domainResourceIDSecurityModelToFeeHandlerAddress[destinationDomainID][resourceID][securityModel];
+
+        return feeHandler.calculateFee(
+            sender,
+            fromDomainID,
+            destinationDomainID,
+            resourceID,
+            securityModel,
+            depositData,
+            feeData
+        );
     }
 }
