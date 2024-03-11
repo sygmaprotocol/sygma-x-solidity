@@ -371,4 +371,39 @@ describe("E2E ERC20 - Two EVM Chains both with decimal places != 18 with roundin
       await originERC20MintableInstance.balanceOf(depositorAccount);
     assert.strictEqual(depositorBalance, initialTokenAmount - roundingLoss);
   });
+
+  it(`should revert if deposit amount would result in converted zero amount`, async () => {
+    const depositAmount = "50";
+
+    const originDepositData = createERCDepositData(
+      depositAmount,
+      20,
+      await recipientAccount.getAddress(),
+    );
+
+    // hardhat locally deploys contract to predictable address, so
+    // ERCHandlerHelpers locally is always deployed to this address
+    const ercHandlerHelpersAddress =
+      "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
+    const ercHandlerHelpersInstance = await ethers.getContractAt(
+      "ERCHandlerHelpers",
+      ercHandlerHelpersAddress,
+    );
+
+    // depositorAccount makes initial deposit of depositAmount
+    await expect(
+      originRouterInstance
+        .connect(depositorAccount)
+        .deposit(
+          destinationDomainID,
+          originResourceID,
+          securityModel,
+          originDepositData,
+          feeData,
+        ),
+    ).to.be.revertedWithCustomError(
+      ercHandlerHelpersInstance,
+      "DepositAmountTooSmall(uint256)",
+    );
+  });
 });
