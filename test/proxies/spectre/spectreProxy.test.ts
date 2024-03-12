@@ -38,7 +38,6 @@ describe("Spectre Proxy", () => {
     participation: 8,
     executionPayloadRoot:
       "0x9109d68183cb2c2b4d8d769a4263195c153ece0d2bc797f44b8f6cec4814439c",
-    accumulator: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
   };
 
   const constructorDomains = [2, 3];
