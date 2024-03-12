@@ -33,6 +33,7 @@ contract Router is Context {
     error DepositToCurrentDomain();
     error AccessNotAllowed(address sender, bytes4 funcSig);
     error BridgeIsPaused();
+    error ZeroAddressProvided();
 
     event Deposit(
         uint8 destinationDomainID,
@@ -58,6 +59,8 @@ contract Router is Context {
     }
 
     constructor(address bridge, address accessControl) {
+        if(bridge == address(0) ||accessControl == address(0)) revert ZeroAddressProvided();
+
         _bridge = IBridge(bridge);
         _accessControl = IAccessControlSegregator(accessControl);
         _domainID = IBridge(_bridge)._domainID();
