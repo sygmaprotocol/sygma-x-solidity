@@ -14,12 +14,6 @@ interface ISpectre {
         uint64 participation;
         bytes32 finalizedHeaderRoot;
         bytes32 executionPayloadRoot;
-        uint256[12] accumulator;
-    }
-    struct RotateInput {
-        bytes32 syncCommitteeSSZ;
-        uint256 syncCommitteePoseidon;
-        uint256[12] accumulator;
     }
 
     /// @notice Verify that a sync committee has attested to a block that finalizes 
@@ -30,12 +24,10 @@ interface ISpectre {
 
 
     /// @notice Use the current sync committee to verify the transition to a new sync committee
-    /// @param rotateInput The input to the sync step.
     /// @param rotateProof The proof for the rotation
     /// @param stepInput The input to the sync step.
     /// @param stepProof The proof for the sync step
     function rotate(
-        RotateInput calldata rotateInput, 
         bytes calldata rotateProof, 
         SyncStepInput calldata stepInput, 
         bytes calldata stepProof

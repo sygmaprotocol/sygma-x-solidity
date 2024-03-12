@@ -30,12 +30,6 @@ describe("Spectre Proxy", () => {
     "0x59dac95a8278295a3a05d809156f69b45007af3f3df94bcabe4bbbdd9cce5c5a",
   ];
 
-  const rotateInput: ISpectre.RotateInputStruct = {
-    syncCommitteePoseidon: "256",
-    syncCommitteeSSZ:
-      "0xcc69885fda6bcc1a4ace058b4a62bf5e179ea78fd58a1ccd71c22cc9b688792f",
-    accumulator: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-  };
   const stepInput: ISpectre.SyncStepInputStruct = {
     finalizedHeaderRoot:
       "0xcc69885fda6bcc1a4ace058b4a62bf5e179ea78fd58a1ccd71c22cc9b688792f",
@@ -105,7 +99,6 @@ describe("Spectre Proxy", () => {
     await expect(
       spectreProxyInstance.rotate(
         invalidOriginDomainID,
-        rotateInput,
         rotateProof,
         stepInput,
         stepProof,
@@ -116,7 +109,6 @@ describe("Spectre Proxy", () => {
   it("should emit event even if rotate successful", async () => {
     const rotateTx = await spectreProxyInstance.rotate(
       validDomainID,
-      rotateInput,
       rotateProof,
       stepInput,
       stepProof,
