@@ -72,7 +72,7 @@ contract Executor is Context {
         address bridge,
         address accessControl
     ) {
-        if(bridge == address(0) ||accessControl == address(0)) revert ZeroAddressProvided();
+        if (bridge == address(0) || accessControl == address(0)) revert ZeroAddressProvided();
 
         _bridge = IBridge(bridge);
         _domainID = _bridge._domainID();

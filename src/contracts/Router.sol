@@ -59,7 +59,7 @@ contract Router is Context {
     }
 
     constructor(address bridge, address accessControl) {
-        if(bridge == address(0) ||accessControl == address(0)) revert ZeroAddressProvided();
+        if (bridge == address(0) || accessControl == address(0)) revert ZeroAddressProvided();
 
         _bridge = IBridge(bridge);
         _accessControl = IAccessControlSegregator(accessControl);

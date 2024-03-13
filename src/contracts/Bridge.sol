@@ -52,7 +52,7 @@ contract Bridge is Pausable, Context {
         @param accessControl Address of access control contract.
      */
     constructor(uint8 domainID, address accessControl) {
-        if(accessControl == address(0)) revert ZeroAddressProvided();
+        if (accessControl == address(0)) revert ZeroAddressProvided();
 
         _domainID = domainID;
         _accessControl = IAccessControlSegregator(accessControl);
