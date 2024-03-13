@@ -28,6 +28,7 @@ describe("Spectre Proxy", () => {
     "0x0c2e45ec77206f3b0cac1da903c4bc05cf177da367c428c1ba3cab0f654f4f78",
     "0xdf581c183b1083cf6be31fde9f6073dfacfc252f8b514577f2ca03955b921552",
     "0x59dac95a8278295a3a05d809156f69b45007af3f3df94bcabe4bbbdd9cce5c5a",
+    "0xcc69885fda6bcc1a4ace058b4a62bf5e179ea78fd58a1ccd71c22cc9b688792f",
   ];
 
   const stepInput: ISpectre.SyncStepInputStruct = {
