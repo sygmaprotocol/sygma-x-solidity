@@ -9,7 +9,7 @@ import "../interfaces/IERCHandler.sol";
     @author ChainSafe Systems.
     @notice This contract is intended to be used with the Bridge contract.
  */
-contract ERCHandlerHelpers is IERCHandler {
+abstract contract ERCHandlerHelpers is IERCHandler {
     address public immutable _bridgeAddress;
     address public immutable _routerAddress;
     address public immutable _executorAddress;
@@ -66,8 +66,6 @@ contract ERCHandlerHelpers is IERCHandler {
     function setBurnable(address contractAddress) external override onlyBridge {
         _setBurnable(contractAddress);
     }
-
-    function withdraw(bytes memory data) external virtual override {}
 
     function _setResource(bytes32 resourceID, address contractAddress) internal {
         _resourceIDToTokenContractAddress[resourceID] = contractAddress;

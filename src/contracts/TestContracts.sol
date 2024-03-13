@@ -54,7 +54,7 @@ contract ReturnData {
     }
 }
 
-contract HandlerRevert is ERCHandlerHelpers {
+abstract contract HandlerRevert is ERCHandlerHelpers {
     uint256 private _totalAmount;
 
     constructor(
@@ -231,8 +231,8 @@ contract TestSpectre {
     }
 
     function rotate(
-        bytes calldata rotateProof, 
-        SyncStepInput calldata stepInput, 
+        bytes calldata rotateProof,
+        SyncStepInput calldata stepInput,
         bytes calldata stepProof
     ) external {}
 }
