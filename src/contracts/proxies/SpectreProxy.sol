@@ -60,14 +60,12 @@ contract SpectreProxy is AccessControl {
     /**
         @notice Proxy for the Spectre rotate function that supports multiple domains
         @param sourceDomainID DomainID of the network for which the proof is submitted
-        @param rotateInput The input to the sync step
         @param rotateProof The proof for the rotation
         @param stepInput The input to the sync step
         @param stepProof The proof for the sync step
     */
     function rotate(
         uint8 sourceDomainID, 
-        ISpectre.RotateInput calldata rotateInput, 
         bytes calldata rotateProof, 
         ISpectre.SyncStepInput calldata stepInput, 
         bytes calldata stepProof
@@ -76,7 +74,7 @@ contract SpectreProxy is AccessControl {
         require(spectreAddress != address(0), "no spectre address found");
 
         ISpectre spectre = ISpectre(spectreAddress);
-        spectre.rotate(rotateInput, rotateProof, stepInput, stepProof);
+        spectre.rotate(rotateProof, stepInput, stepProof);
 
         emit CommitteeRotated(sourceDomainID, stepInput.attestedSlot);
     }
