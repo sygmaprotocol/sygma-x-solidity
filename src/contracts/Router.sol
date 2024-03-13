@@ -25,7 +25,7 @@ contract Router is Context {
     uint8 public immutable _domainID;
 
     // this is used to store the hash of the transfer data in
-    // the EVM state so it can proved in the Executor contract via state proof
+    // the EVM state so it can be proved in the Executor contract via state proof
     // domainID => nonce => transferHashes
     mapping(uint8 => mapping(uint256 => bytes32)) public transferHashes;
     // destinationDomainID => number of deposits
