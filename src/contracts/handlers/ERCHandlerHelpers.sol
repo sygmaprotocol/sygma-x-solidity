@@ -37,13 +37,25 @@ abstract contract ERCHandlerHelpers is IERCHandler {
     // token contract address => ERCTokenContractProperties
     mapping(address => ERCTokenContractProperties) public _tokenContractAddressToTokenProperties;
 
-    modifier onlyBridgeRouterOrExecutor() {
-        _onlyBridgeRouterOrExecutor();
+    modifier onlyBridge() {
+        _onlyBridge();
+        _;
+    }
+
+    modifier onlyRouter() {
+        _onlyRouter();
+        _;
+    }
+
+    modifier onlyExecutor() {
+        _onlyExecutor();
         _;
     }
 
     /**
         @param bridgeAddress Contract address of previously deployed Bridge.
+        @param routerAddress Contract address of previously deployed Router.
+        @param executorAddress Contract address of previously deployed Executor.
      */
     constructor(address bridgeAddress, address routerAddress, address executorAddress) {
         _bridgeAddress = bridgeAddress;
@@ -51,12 +63,16 @@ abstract contract ERCHandlerHelpers is IERCHandler {
         _executorAddress = executorAddress;
     }
 
-    function _onlyBridgeRouterOrExecutor() private view {
-        require(
-            msg.sender == _bridgeAddress ||
-            msg.sender == _routerAddress ||
-            msg.sender == _executorAddress,
-            "sender must be bridge, router or executor contract");
+    function _onlyBridge() private view {
+        require(msg.sender == _bridgeAddress, "sender must be bridge contract");
+    }
+
+    function _onlyRouter() private view {
+        require(msg.sender == _routerAddress, "sender must be router contract");
+    }
+
+    function _onlyExecutor() private view {
+        require(msg.sender == _executorAddress, "sender must be executor contract");
     }
 
     /**
@@ -64,7 +80,7 @@ abstract contract ERCHandlerHelpers is IERCHandler {
         {_tokenContractAddressToTokenProperties[contractAddress].isBurnable} to true.
         @param contractAddress Address of contract to be used when making or executing deposits.
      */
-    function setBurnable(address contractAddress) external override onlyBridgeRouterOrExecutor {
+    function setBurnable(address contractAddress) external override onlyBridge {
         _setBurnable(contractAddress);
     }
 

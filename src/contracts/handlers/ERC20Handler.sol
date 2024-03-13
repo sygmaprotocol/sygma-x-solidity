@@ -42,7 +42,7 @@ contract ERC20Handler is IHandler, ERCHandlerHelpers, ERC20Safe {
         bytes32 resourceID,
         address depositor,
         bytes calldata data
-    ) external override onlyBridgeRouterOrExecutor returns (bytes memory) {
+    ) external override onlyRouter returns (bytes memory) {
         uint256 amount;
         uint256 destinationRecipientAddressLen;
         bytes memory destinationRecipientAddress;
@@ -80,7 +80,7 @@ contract ERC20Handler is IHandler, ERCHandlerHelpers, ERC20Safe {
     function executeProposal(
         bytes32 resourceID,
         bytes calldata data
-    ) external override onlyBridgeRouterOrExecutor returns (bytes memory) {
+    ) external override onlyExecutor returns (bytes memory) {
         uint256 amount;
         uint256 lenDestinationRecipientAddress;
         bytes memory destinationRecipientAddress;
@@ -114,7 +114,7 @@ contract ERC20Handler is IHandler, ERCHandlerHelpers, ERC20Safe {
         recipient                              address     bytes  32 - 64
         amount                                 uint256     bytes  64 - 96
      */
-    function withdraw(bytes memory data) external override onlyBridgeRouterOrExecutor {
+    function withdraw(bytes memory data) external override onlyBridge {
         address tokenAddress;
         address recipient;
         uint256 amount;
@@ -134,7 +134,7 @@ contract ERC20Handler is IHandler, ERCHandlerHelpers, ERC20Safe {
         @param contractAddress Address of contract to be called when a deposit is made and a deposited is executed.
         @param args Additional data to be passed to specified handler.
      */
-    function setResource(bytes32 resourceID, address contractAddress, bytes calldata args) external onlyBridgeRouterOrExecutor {
+    function setResource(bytes32 resourceID, address contractAddress, bytes calldata args) external onlyBridge {
         _setResource(resourceID, contractAddress);
 
         if (args.length > 0) {
