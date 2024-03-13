@@ -29,6 +29,7 @@ abstract contract ERCHandlerHelpers is IERCHandler {
     }
 
     error ContractAddressNotWhitelisted(address contractAddress);
+    error DepositAmountTooSmall(uint256 depositAmount);
 
     // resourceID => token contract address
     mapping(bytes32 => address) public _resourceIDToTokenContractAddress;
@@ -128,6 +129,10 @@ abstract contract ERCHandlerHelpers is IERCHandler {
             convertedBalance = amount / (10 ** (decimals.externalDecimals - DEFAULT_DECIMALS));
         } else {
             convertedBalance = amount * (10 ** (DEFAULT_DECIMALS - decimals.externalDecimals));
+        }
+
+        if (convertedBalance == 0) {
+            revert DepositAmountTooSmall(amount);
         }
 
         return convertedBalance;
