@@ -4,7 +4,7 @@
 pragma solidity 0.8.11;
 
 import "../interfaces/ISpectre.sol";
-import "../utils/AccessControl.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
 
 /**
     @title Proxies calls to Spectre https://github.com/ChainSafe/Spectre/blob/main/contracts/src/Spectre.sol
@@ -65,9 +65,9 @@ contract SpectreProxy is AccessControl {
         @param stepProof The proof for the sync step
     */
     function rotate(
-        uint8 sourceDomainID, 
-        bytes calldata rotateProof, 
-        ISpectre.SyncStepInput calldata stepInput, 
+        uint8 sourceDomainID,
+        bytes calldata rotateProof,
+        ISpectre.SyncStepInput calldata stepInput,
         bytes calldata stepProof
     ) external {
         address spectreAddress = spectreContracts[sourceDomainID];
@@ -101,7 +101,7 @@ contract SpectreProxy is AccessControl {
 
         bytes32 executionRoot = spectre.executionPayloadRoots(input.finalizedSlot);
         require(
-            verifyMerkleBranch(stateRoot, executionRoot, stateRootProof, STATE_ROOT_INDEX), 
+            verifyMerkleBranch(stateRoot, executionRoot, stateRootProof, STATE_ROOT_INDEX),
             "invalid merkle proof"
         );
 
@@ -119,12 +119,12 @@ contract SpectreProxy is AccessControl {
     function getStateRoot(uint8 sourceDomainID, uint256 slot)  public view returns (bytes32) {
         return stateRoots[sourceDomainID][slot];
     }
-    
+
 
     function verifyMerkleBranch(
-        bytes32 leaf, 
-        bytes32 root, 
-        bytes[] calldata proof, 
+        bytes32 leaf,
+        bytes32 root,
+        bytes[] calldata proof,
         uint8 index
     ) internal pure returns (bool) {
         bytes32 value = leaf;
@@ -136,7 +136,7 @@ contract SpectreProxy is AccessControl {
                 value = sha256(abi.encodePacked(value, proof[i]));
             }
         }
-        
+
         return value == root;
     }
 
