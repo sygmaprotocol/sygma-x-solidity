@@ -14,6 +14,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 contract SpectreProxy is AccessControl {
 
     uint8 public constant STATE_ROOT_INDEX = 34;
+    uint8 public constant STATE_ROOT_DEPTH = 4;
 
     // source domainID => slot => state root
     mapping(uint8 => mapping(uint256 => bytes32)) public stateRoots;
@@ -129,7 +130,7 @@ contract SpectreProxy is AccessControl {
     ) internal pure returns (bool) {
         bytes32 value = leaf;
 
-        for (uint256 i = 0; i < proof.length; i++) {
+        for (uint256 i = 0; i < STATE_ROOT_DEPTH; i++) {
             if ((index / (2**i)) % 2 == 1) {
                 value = sha256(abi.encodePacked(proof[i], value));
             } else {
