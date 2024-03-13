@@ -95,6 +95,10 @@ contract Router is Context {
         if (destinationDomainID == _domainID) revert DepositToCurrentDomain();
         address sender = _msgSender();
         IFeeHandler feeHandler = _bridge._feeHandler();
+        address handler = _bridge._resourceIDToHandlerAddress(resourceID);
+
+        if (handler == address(0)) revert ResourceIDNotMappedToHandler();
+
         if (address(feeHandler) == address(0)) {
             require(msg.value == 0, "no FeeHandler, msg.value != 0");
         } else {
@@ -109,8 +113,6 @@ contract Router is Context {
                 feeData
             );
         }
-        address handler = _bridge._resourceIDToHandlerAddress(resourceID);
-        if (handler == address(0)) revert ResourceIDNotMappedToHandler();
         depositNonce = ++_depositCounts[destinationDomainID];
         IHandler depositHandler = IHandler(handler);
         bytes memory handlerDepositData = depositHandler.deposit(resourceID, sender, depositData);
