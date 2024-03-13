@@ -54,7 +54,7 @@ contract ReturnData {
     }
 }
 
-contract HandlerRevert is ERCHandlerHelpers {
+abstract contract HandlerRevert is ERCHandlerHelpers {
     uint256 private _totalAmount;
 
     constructor(
@@ -222,13 +222,6 @@ contract TestSpectre {
         uint64 participation;
         bytes32 finalizedHeaderRoot;
         bytes32 executionPayloadRoot;
-        uint256[12] accumulator;
-    }
-
-    struct RotateInput {
-        bytes32 syncCommitteeSSZ;
-        uint256 syncCommitteePoseidon;
-        uint256[12] accumulator;
     }
 
     mapping(uint256 => bytes32) public executionPayloadRoots;
@@ -238,9 +231,8 @@ contract TestSpectre {
     }
 
     function rotate(
-        RotateInput calldata rotateInput, 
-        bytes calldata rotateProof, 
-        SyncStepInput calldata stepInput, 
+        bytes calldata rotateProof,
+        SyncStepInput calldata stepInput,
         bytes calldata stepProof
     ) external {}
 }

@@ -141,39 +141,41 @@ contract Executor is Context {
         if (proposals.length == 0) revert EmptyProposalsArray();
 
         for (uint256 i = 0; i < proposals.length; i++) {
-            if (isProposalExecuted(proposals[i].originDomainID, proposals[i].depositNonce)) {
+            Proposal memory proposal = proposals[i];
+
+            if (isProposalExecuted(proposal.originDomainID, proposal.depositNonce)) {
                 continue;
             }
             bytes32 expectedStateRoot;
             bytes32 storageRoot;
-            address routerAddress = _originDomainIDToRouter[proposals[i].originDomainID];
+            address routerAddress = _originDomainIDToRouter[proposal.originDomainID];
 
             IStateRootStorage checkingStateRootStorage = IStateRootStorage(
-                _securityModels[proposals[i].securityModel][0]
+                _securityModels[proposal.securityModel][0]
             );
-            expectedStateRoot = checkingStateRootStorage.getStateRoot(proposals[i].originDomainID, slot);
-            uint256 numberOfSecurityModels = _securityModels[proposals[i].securityModel].length;
+            expectedStateRoot = checkingStateRootStorage.getStateRoot(proposal.originDomainID, slot);
+            uint256 numberOfSecurityModels = _securityModels[proposal.securityModel].length;
 
             for (uint256 j = 1; j < numberOfSecurityModels; j++) {
-                IStateRootStorage stateRootStorage = IStateRootStorage(_securityModels[proposals[i].securityModel][j]);
-                bytes32 stateRoot = stateRootStorage.getStateRoot(proposals[i].originDomainID, slot);
+                IStateRootStorage stateRootStorage = IStateRootStorage(_securityModels[proposal.securityModel][j]);
+                bytes32 stateRoot = stateRootStorage.getStateRoot(proposal.originDomainID, slot);
                 if(expectedStateRoot != stateRoot) revert StateRootDoesNotMatch(stateRootStorage, stateRoot);
             }
 
             storageRoot = StorageProof.getStorageRoot(accountProof, routerAddress, expectedStateRoot);
-            address handler = IBridge(_bridge)._resourceIDToHandlerAddress(proposals[i].resourceID);
+            address handler = IBridge(_bridge)._resourceIDToHandlerAddress(proposal.resourceID);
             IHandler depositHandler = IHandler(handler);
-            verify(proposals[i], storageRoot);
+            verify(proposal, storageRoot);
 
-            markNonceAsUsed(proposals[i].originDomainID, proposals[i].depositNonce);
-            try depositHandler.executeProposal(proposals[i].resourceID, proposals[i].data) returns (
+            markNonceAsUsed(proposal.originDomainID, proposal.depositNonce);
+            try depositHandler.executeProposal(proposal.resourceID, proposal.data) returns (
                 bytes memory handlerResponse
             ) {
-                emit ProposalExecution(proposals[i].originDomainID, proposals[i].depositNonce, handlerResponse);
+                emit ProposalExecution(proposal.originDomainID, proposal.depositNonce, handlerResponse);
             } catch (bytes memory lowLevelData) {
-                emit FailedHandlerExecution(lowLevelData, proposals[i].originDomainID, proposals[i].depositNonce);
-                usedNonces[proposals[i].originDomainID][proposals[i].depositNonce / 256] &= ~(1 <<
-                    (proposals[i].depositNonce % 256));
+                emit FailedHandlerExecution(lowLevelData, proposal.originDomainID, proposal.depositNonce);
+                usedNonces[proposal.originDomainID][proposal.depositNonce / 256] &= ~(1 <<
+                    (proposal.depositNonce % 256));
                 continue;
             }
         }
