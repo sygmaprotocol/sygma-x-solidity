@@ -161,7 +161,7 @@ contract Executor is Context {
             }
 
             storageRoot = StorageProof.getStorageRoot(accountProof, routerAddress, expectedStateRoot);
-            address handler = _bridge._resourceIDToHandlerAddress(proposals[i].resourceID);
+            address handler = _bridge._resourceIDToHandlerAddress(proposal.resourceID);
             IHandler depositHandler = IHandler(handler);
             verify(proposal, storageRoot);
 
