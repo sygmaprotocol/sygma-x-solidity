@@ -173,7 +173,7 @@ library MerkleTrie {
                     return value_;
                 } else if (prefix == PREFIX_EXTENSION_EVEN || prefix == PREFIX_EXTENSION_ODD) {
                     // Prefix of 0 or 1 means this is an extension node. We move onto the next node
-                    // in the proof and increment the key index by the length of the path remainderr
+                    // in the proof and increment the key index by the length of the path remainder
                     // which is equal to the shared nibble length.
                     currentNodeID = _getNodeID(currentNode.decoded[1]);
                     currentKeyIndex += sharedNibbleLength;
