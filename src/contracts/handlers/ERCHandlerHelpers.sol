@@ -30,6 +30,7 @@ abstract contract ERCHandlerHelpers is IERCHandler {
 
     error ContractAddressNotWhitelisted(address contractAddress);
     error DepositAmountTooSmall(uint256 depositAmount);
+    error SenderNotBridgeRouterOrExecutor();
 
     // resourceID => token contract address
     mapping(bytes32 => address) public _resourceIDToTokenContractAddress;
@@ -52,11 +53,11 @@ abstract contract ERCHandlerHelpers is IERCHandler {
     }
 
     function _onlyBridge() private view {
-        require(
-            msg.sender == _bridgeAddress ||
-            msg.sender == _routerAddress ||
-            msg.sender == _executorAddress,
-            "sender must be bridge, router or executor contract");
+        if (
+            msg.sender != _bridgeAddress &&
+            msg.sender != _routerAddress &&
+            msg.sender != _executorAddress
+        ) revert SenderNotBridgeRouterOrExecutor();
     }
 
     /**

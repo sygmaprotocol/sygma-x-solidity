@@ -11,6 +11,10 @@ pragma solidity 0.8.11;
  *
  */
 contract Pausable {
+
+    error ContractIsPaused();
+    error ContractIsNotPaused();
+
     /**
      * @dev Emitted when the pause is triggered by `account`.
      */
@@ -50,7 +54,7 @@ contract Pausable {
     }
 
     function _whenNotPaused() private view {
-        require(!_paused, "Pausable: paused");
+        if (_paused) revert ContractIsPaused();
     }
 
     /**
@@ -66,7 +70,7 @@ contract Pausable {
     }
 
     function _whenPaused() private view {
-        require(_paused, "Pausable: not paused");
+        if (!_paused) revert ContractIsNotPaused();
     }
 
     /**

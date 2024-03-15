@@ -256,7 +256,10 @@ describe("PercentageFeeHandler - [distributeFee]", () => {
           ],
           [payout, payout],
         ),
-    ).to.be.revertedWith("sender doesn't have admin role");
+    ).to.be.revertedWithCustomError(
+      percentageFeeHandlerInstance,
+      "SenderNotAdmin",
+    );
   });
 
   it("should revert if addrs and amounts arrays have different length", async () => {
@@ -285,6 +288,9 @@ describe("PercentageFeeHandler - [distributeFee]", () => {
         ],
         [payout, payout, payout],
       ),
-    ).to.be.revertedWith("addrs[], amounts[]: diff length");
+    ).to.be.revertedWithCustomError(
+      percentageFeeHandlerInstance,
+      "AddressesAndAmountsArraysDifferentLength",
+    );
   });
 });

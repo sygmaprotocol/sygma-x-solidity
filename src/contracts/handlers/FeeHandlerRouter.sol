@@ -24,6 +24,8 @@ contract FeeHandlerRouter is IFeeHandler, AccessControl {
     event WhitelistChanged(address whitelistAddress, bool isWhitelisted);
 
     error IncorrectFeeSupplied(uint256);
+    error SenderNotRouterContract();
+    error SenderNotAdmin();
 
     modifier onlyRouter() {
         _onlyRouter();
@@ -31,7 +33,7 @@ contract FeeHandlerRouter is IFeeHandler, AccessControl {
     }
 
     function _onlyRouter() private view {
-        require(msg.sender == _routerAddress, "sender must be router contract");
+        if (msg.sender != _routerAddress) revert SenderNotRouterContract();
     }
 
     modifier onlyAdmin() {
@@ -40,7 +42,7 @@ contract FeeHandlerRouter is IFeeHandler, AccessControl {
     }
 
     function _onlyAdmin() private view {
-        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "sender doesn't have admin role");
+        if (!hasRole(DEFAULT_ADMIN_ROLE, _msgSender())) revert SenderNotAdmin();
     }
 
     /**

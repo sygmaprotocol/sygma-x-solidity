@@ -15,6 +15,7 @@ import type {
   ERC20Handler,
   ERC20PresetMinterPauser,
   StateRootStorage,
+  MerkleTrie__factory,
 } from "../../typechain-types";
 
 describe("Bridge - [execute proposal - ERC20]", () => {
@@ -38,6 +39,7 @@ describe("Bridge - [execute proposal - ERC20]", () => {
   let ERC20MintableInstance: ERC20PresetMinterPauser;
   let ERC20HandlerInstance: ERC20Handler;
   let stateRootStorageInstance: StateRootStorage;
+  let MerkleTrieContract: MerkleTrie__factory;
   let depositorAccount: HardhatEthersSigner;
   let recipientAccount: HardhatEthersSigner;
   let relayer1: HardhatEthersSigner;
@@ -126,6 +128,8 @@ describe("Bridge - [execute proposal - ERC20]", () => {
       slot,
       stateRoot,
     );
+
+    MerkleTrieContract = await ethers.getContractFactory("MerkleTrie");
   });
 
   it("isProposalExecuted returns false if depositNonce is not used", async () => {
@@ -299,8 +303,9 @@ describe("Bridge - [execute proposal - ERC20]", () => {
       .connect(relayer1)
       .executeProposal(invalidProposal, accountProof1, slot);
 
-    await expect(proposalTx).to.be.revertedWith(
-      "MerkleTrie: invalid large internal hash",
+    await expect(proposalTx).to.be.revertedWithCustomError(
+      MerkleTrieContract,
+      "MerkleTrieInvalidLargeInternalHash",
     );
 
     // check that deposit nonce has not been marked as used in bitmap
@@ -347,7 +352,10 @@ describe("Bridge - [execute proposal - ERC20]", () => {
     it("[sanity] should fail if verifiers array is empty", async () => {
       await expect(
         executorInstance.adminSetVerifiers(1, []),
-      ).to.be.rejectedWith("Should provide at least one verifier address");
+      ).to.be.revertedWithCustomError(
+        executorInstance,
+        "NoVerifierAddressProvided",
+      );
     });
 
     it("should successfully execute a proposal", async () => {

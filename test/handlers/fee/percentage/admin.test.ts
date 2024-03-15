@@ -140,7 +140,10 @@ describe("PercentageFeeHandler - [admin]", () => {
       percentageFeeHandlerInstance
         .connect(nonAdminAccount)
         .changeFee(destinationDomainID, resourceID, securityModel, fee),
-    ).to.be.revertedWith("sender doesn't have admin role");
+    ).to.be.revertedWithCustomError(
+      percentageFeeHandlerInstance,
+      "SenderNotAdmin",
+    );
   });
 
   it("should set fee bounds", async () => {
@@ -182,7 +185,10 @@ describe("PercentageFeeHandler - [admin]", () => {
       percentageFeeHandlerInstance
         .connect(nonAdminAccount)
         .changeFeeBounds(resourceID, lowerBound, upperBound),
-    ).to.be.revertedWith("sender doesn't have admin role");
+    ).to.be.revertedWithCustomError(
+      percentageFeeHandlerInstance,
+      "SenderNotAdmin",
+    );
   });
 
   it("PercentageFeeHandler admin should be changed to newPercentageFeeHandlerAdmin", async () => {

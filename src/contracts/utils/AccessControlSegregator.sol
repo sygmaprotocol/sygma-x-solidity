@@ -13,6 +13,9 @@ contract AccessControlSegregator {
 
     bytes4 public constant GRANT_ACCESS_SIG = AccessControlSegregator(address(0)).grantAccess.selector;
 
+    error ArrayLengthsDoNotMatch();
+    error SenderWithoutAccessRights();
+
     /**
         @notice Initializes access control to functions and sets initial
         access to grantAccess function.
@@ -20,7 +23,7 @@ contract AccessControlSegregator {
         @param accounts List of accounts.
     */
     constructor(bytes4[] memory functions, address[] memory accounts) {
-        require(accounts.length == functions.length, "array length should be equal");
+        if (accounts.length != functions.length) revert ArrayLengthsDoNotMatch();
 
         _grantAccess(GRANT_ACCESS_SIG, msg.sender);
         for (uint8 i = 0; i < accounts.length; i++) {
@@ -45,7 +48,7 @@ contract AccessControlSegregator {
         @param account Address of account.
     */
     function grantAccess(bytes4 sig, address account) public {
-        require(hasAccess(GRANT_ACCESS_SIG, msg.sender), "sender doesn't have grant access rights");
+        if (!hasAccess(GRANT_ACCESS_SIG, msg.sender)) revert SenderWithoutAccessRights();
 
         _grantAccess(sig, account);
     }

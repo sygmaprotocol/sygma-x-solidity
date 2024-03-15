@@ -185,7 +185,10 @@ describe("PercentageFeeHandler - [collectFee]", () => {
             value: ethers.parseEther("0.5"),
           },
         ),
-    ).to.be.revertedWith("collectFee: msg.value != 0");
+    ).to.be.revertedWithCustomError(
+      percentageFeeHandlerInstance,
+      "MsgValueNotZero",
+    );
   });
 
   it("deposit should revert if fee collection fails", async () => {
@@ -238,7 +241,10 @@ describe("PercentageFeeHandler - [collectFee]", () => {
             value: ethers.parseEther("0.5").toString(),
           },
         ),
-    ).to.be.revertedWith("sender must be bridge or fee router contract");
+    ).to.be.revertedWithCustomError(
+      percentageFeeHandlerInstance,
+      "SenderNotBridgeOrRouter",
+    );
   });
 
   it("deposit should revert if not called by bridge on FeeHandlerRouter contract", async () => {
@@ -266,7 +272,10 @@ describe("PercentageFeeHandler - [collectFee]", () => {
             value: ethers.parseEther("0.5"),
           },
         ),
-    ).to.be.revertedWith("sender must be router contract");
+    ).to.be.revertedWithCustomError(
+      feeHandlerRouterInstance,
+      "SenderNotRouterContract",
+    );
   });
 
   it("should successfully change fee handler from FeeRouter to PercentageFeeHandler and collect fee", async () => {

@@ -80,7 +80,7 @@ describe("Spectre Proxy", () => {
       spectreProxyInstance
         .connect(nonAdminAccount)
         .adminSetSpectreAddress(originDomainID, spectreAddress),
-    ).to.be.revertedWith("sender doesn't have admin role");
+    ).to.be.revertedWithCustomError(spectreProxyInstance, "SenderNotAdmin");
   });
 
   it("should set spectre address with an admin role", async () => {
@@ -103,7 +103,10 @@ describe("Spectre Proxy", () => {
         stepInput,
         stepProof,
       ),
-    ).to.be.revertedWith("no spectre address found");
+    ).to.be.revertedWithCustomError(
+      spectreProxyInstance,
+      "SpectreAddressNotFound",
+    );
   });
 
   it("should emit event even if rotate successful", async () => {
@@ -128,7 +131,10 @@ describe("Spectre Proxy", () => {
         validStateRoot,
         validStateRootProof,
       ),
-    ).to.be.revertedWith("no spectre address found");
+    ).to.be.revertedWithCustomError(
+      spectreProxyInstance,
+      "SpectreAddressNotFound",
+    );
   });
 
   it("should revert if step proof not valid", async () => {
@@ -140,7 +146,7 @@ describe("Spectre Proxy", () => {
         validStateRoot,
         invalidStateRootProof,
       ),
-    ).to.be.revertedWith("invalid merkle proof");
+    ).to.be.revertedWithCustomError(spectreProxyInstance, "InvalidMerkleProof");
   });
 
   it("should revert if step state root not valid", async () => {
@@ -152,7 +158,7 @@ describe("Spectre Proxy", () => {
         invalidStateRoot,
         validStateRootProof,
       ),
-    ).to.be.revertedWith("invalid merkle proof");
+    ).to.be.revertedWithCustomError(spectreProxyInstance, "InvalidMerkleProof");
   });
 
   it("should emit event and store state root if step valid", async () => {

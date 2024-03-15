@@ -12,6 +12,11 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
     @notice This contract is intended to be used with ERC20Handler contract.
  */
 contract ERC20Safe {
+
+    error ERC20NonContractCall();
+    error ERC20CallFailed();
+    error ERC20OperationFailed();
+
     /**
         @notice Used to gain custody of deposited token.
         @param tokenAddress Address of ERC20 to transfer.
@@ -88,13 +93,13 @@ contract ERC20Safe {
         assembly {
             tokenSize := extcodesize(token)
         }
-        require(tokenSize > 0, "ERC20: not a contract");
+        if (tokenSize <= 0) revert ERC20NonContractCall();
 
         (bool success, bytes memory returndata) = address(token).call(data);
-        require(success, "ERC20: call failed");
+        if (!success) revert ERC20CallFailed();
 
         if (returndata.length > 0) {
-            require(abi.decode(returndata, (bool)), "ERC20: operation did not succeed");
+            if (!abi.decode(returndata, (bool))) revert ERC20OperationFailed();
         }
     }
 }

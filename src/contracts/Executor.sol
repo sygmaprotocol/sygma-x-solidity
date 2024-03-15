@@ -50,6 +50,7 @@ contract Executor is Context {
     error EmptyProposalsArray();
     error BridgeIsPaused();
     error ZeroAddressProvided();
+    error NoVerifierAddressProvided();
     error AccessNotAllowed(address sender, bytes4 funcSig);
     error TransferHashDoesNotMatchSlotValue(bytes32 transferHash);
     error StateRootDoesNotMatch(IStateRootStorage stateRootStorage, bytes32 stateRoot);
@@ -109,7 +110,7 @@ contract Executor is Context {
         @param verifiersAddresses Array of verifiers addresses which store state roots.
      */
     function adminSetVerifiers(uint8 securityModel, address[] memory verifiersAddresses) external onlyAllowed {
-        require(verifiersAddresses.length > 0, "Should provide at least one verifier address");
+        if (verifiersAddresses.length <= 0) revert NoVerifierAddressProvided();
         _securityModels[securityModel] = verifiersAddresses;
     }
 

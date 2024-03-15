@@ -7,6 +7,10 @@ pragma solidity ^0.8.11;
  * @notice Bytes is a library for manipulating byte arrays.
  */
 library Bytes {
+
+    error SliceOwerflow();
+    error SliceOutOfBounds();
+
     /**
      * @notice Slices a byte array with a given starting index and length. Returns a new byte array
      *         as opposed to a pointer to the original array. Will throw if trying to slice more
@@ -24,9 +28,9 @@ library Bytes {
         uint256 _length
     ) internal pure returns (bytes memory) {
         unchecked {
-            require(_length + 31 >= _length, "slice_overflow");
-            require(_start + _length >= _start, "slice_overflow");
-            require(_bytes.length >= _start + _length, "slice_outOfBounds");
+            if (_length + 31 < _length) revert SliceOwerflow();
+            if (_start + _length < _start) revert SliceOwerflow();
+            if (_bytes.length < _start + _length) revert SliceOutOfBounds();
         }
 
         bytes memory tempBytes;

@@ -29,6 +29,10 @@ contract PercentageERC20FeeHandlerEVM is BasicFeeHandler, ERC20Safe {
 
     event FeeBoundsChanged(uint256 newLowerBound, uint256 newUpperBound);
 
+    error MsgValueNotZero();
+    error InvalidBoundsRatio(uint128 newLowerBound, uint128 newUpperBound);
+    error NewBoundsEqualCurrentBounds(uint128 currentLowerBound, uint128 currentUpperBound);
+
     /**
         @param bridgeAddress Contract address of previously deployed Bridge.
         @param feeHandlerRouterAddress Contract address of previously deployed FeeHandlerRouter.
@@ -121,8 +125,8 @@ contract PercentageERC20FeeHandlerEVM is BasicFeeHandler, ERC20Safe {
         uint8 securityModel,
         bytes calldata depositData,
         bytes calldata feeData
-    ) external payable override onlyBridgeOrRouter {
-        require(msg.value == 0, "collectFee: msg.value != 0");
+    ) external payable override onlyRouterOrFeeRouter {
+        if (msg.value != 0) revert MsgValueNotZero();
 
         (uint256 fee, address tokenAddress) = _calculateFee(
             sender,
@@ -146,15 +150,14 @@ contract PercentageERC20FeeHandlerEVM is BasicFeeHandler, ERC20Safe {
         @param newUpperBound Value {_newUpperBound} will be updated to.
      */
     function changeFeeBounds(bytes32 resourceID, uint128 newLowerBound, uint128 newUpperBound) external onlyAdmin {
-        require(
-            newUpperBound == 0 || (newUpperBound > newLowerBound),
-            "Upper bound must be larger than lower bound or 0"
-        );
+        if (newUpperBound != 0 && (newUpperBound <= newLowerBound)) {
+            revert InvalidBoundsRatio(newLowerBound, newUpperBound);
+        }
+
         Bounds memory existingBounds = _resourceIDToFeeBounds[resourceID];
-        require(
-            existingBounds.lowerBound != newLowerBound || existingBounds.upperBound != newUpperBound,
-            "Current bounds are equal to new bounds"
-        );
+        if (existingBounds.lowerBound == newLowerBound && existingBounds.upperBound == newUpperBound) {
+            revert NewBoundsEqualCurrentBounds(existingBounds.lowerBound, existingBounds.upperBound);
+        }
 
         Bounds memory newBounds = Bounds(newLowerBound, newUpperBound);
         _resourceIDToFeeBounds[resourceID] = newBounds;
@@ -175,7 +178,10 @@ contract PercentageERC20FeeHandlerEVM is BasicFeeHandler, ERC20Safe {
         address[] calldata addrs,
         uint256[] calldata amounts
     ) external onlyAdmin {
-        require(addrs.length == amounts.length, "addrs[], amounts[]: diff length");
+        if (addrs.length != amounts.length) revert AddressesAndAmountsArraysDifferentLength(
+            addrs.length,
+            amounts.length
+        );
         address tokenHandler = IBridge(_bridgeAddress)._resourceIDToHandlerAddress(resourceID);
         address tokenAddress = IERCHandler(tokenHandler)._resourceIDToTokenContractAddress(resourceID);
         for (uint256 i = 0; i < addrs.length; i++) {

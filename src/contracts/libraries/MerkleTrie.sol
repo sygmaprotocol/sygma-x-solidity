@@ -21,6 +21,19 @@ library MerkleTrie {
         RLPReader.RLPItem[] decoded;
     }
 
+    error MerkleTrieEmptyKey();
+    error MerkleTrieKeyIndexExceedsKeyLength();
+    error MerkleTrieInvalidRootHash();
+    error MerkleTrieInvalidInternalNodeHash();
+    error MerkleTrieInvalidLargeInternalHash();
+    error MerkleTrieValueNodeNotLastInProof();
+    error RLPReaderDecodedItemIsNotAListItem();
+    error MerkleTriePathMustShareAllNibblesWithKey();
+    error MerkleTrieKeyRemainderMustEqualPathRemainder();
+    error MerkleTrieValueLengthIsZero();
+    error MerkleTrieNodeWithUnknownPrefix();
+    error MerkleTrieUnparsableNode();
+
     /// @notice Determines the number of elements per branch node.
     uint256 internal constant TREE_RADIX = 16;
 
@@ -70,7 +83,7 @@ library MerkleTrie {
     /// @param _root  Known root of the Merkle trie.
     /// @return value_ Value of the key if it exists.
     function get(bytes memory _key, bytes[] memory _proof, bytes32 _root) internal pure returns (bytes memory value_) {
-        require(_key.length > 0, "MerkleTrie: empty key");
+        if (_key.length <= 0) revert MerkleTrieEmptyKey();
 
         TrieNode[] memory proof = _parseProof(_proof);
         bytes memory key = Bytes.toNibbles(_key);
@@ -82,23 +95,23 @@ library MerkleTrie {
             TrieNode memory currentNode = proof[i];
 
             // Key index should never exceed total key length or we'll be out of bounds.
-            require(currentKeyIndex <= key.length, "MerkleTrie: key index exceeds total key length");
+            if (currentKeyIndex > key.length) revert MerkleTrieKeyIndexExceedsKeyLength();
 
             if (currentKeyIndex == 0) {
                 // First proof element is always the root node.
-                require(
-                    Bytes.equal(abi.encodePacked(keccak256(currentNode.encoded)), currentNodeID),
-                    "MerkleTrie: invalid root hash"
-                );
+                if (!Bytes.equal(abi.encodePacked(keccak256(currentNode.encoded)), currentNodeID)) {
+                    revert MerkleTrieInvalidRootHash();
+                }
             } else if (currentNode.encoded.length >= 32) {
                 // Nodes 32 bytes or larger are hashed inside branch nodes.
-                require(
-                    Bytes.equal(abi.encodePacked(keccak256(currentNode.encoded)), currentNodeID),
-                    "MerkleTrie: invalid large internal hash"
-                );
+                if (!Bytes.equal(abi.encodePacked(keccak256(currentNode.encoded)), currentNodeID)) {
+                    revert MerkleTrieInvalidLargeInternalHash();
+                }
             } else {
                 // Nodes smaller than 32 bytes aren't hashed.
-                require(Bytes.equal(currentNode.encoded, currentNodeID), "MerkleTrie: invalid internal node hash");
+                if (!Bytes.equal(currentNode.encoded, currentNodeID)) {
+                    revert MerkleTrieInvalidInternalNodeHash();
+                }
             }
 
             if (currentNode.decoded.length == BRANCH_NODE_LENGTH) {
@@ -109,10 +122,10 @@ library MerkleTrie {
                     // even when the value wasn't explicitly placed there. Geth treats a value of
                     // bytes(0) as "key does not exist" and so we do the same.
                     value_ = RLPReader.readBytes(currentNode.decoded[TREE_RADIX]);
-                    require(value_.length > 0, "MerkleTrie: value length must be greater than zero (branch)");
+                    if (value_.length <= 0) revert MerkleTrieValueLengthIsZero();
 
                     // Extra proof elements are not allowed.
-                    require(i == proof.length - 1, "MerkleTrie: value node must be last node in proof (branch)");
+                    if (i != proof.length - 1) revert MerkleTrieValueNodeNotLastInProof();
 
                     return value_;
                 } else {
@@ -134,10 +147,7 @@ library MerkleTrie {
                 // Whether this is a leaf node or an extension node, the path remainder MUST be a
                 // prefix of the key remainder (or be equal to the key remainder) or the proof is
                 // considered invalid.
-                require(
-                    pathRemainder.length == sharedNibbleLength,
-                    "MerkleTrie: path remainder must share all nibbles with key"
-                );
+                if (pathRemainder.length != sharedNibbleLength) revert MerkleTriePathMustShareAllNibblesWithKey();
 
                 if (prefix == PREFIX_LEAF_EVEN || prefix == PREFIX_LEAF_ODD) {
                     // Prefix of 2 or 3 means this is a leaf node. For the leaf node to be valid,
@@ -146,33 +156,32 @@ library MerkleTrie {
                     // the key remainder length equals the shared nibble length, which implies
                     // equality with the path remainder (since we already did the same check with
                     // the path remainder and the shared nibble length).
-                    require(
-                        keyRemainder.length == sharedNibbleLength,
-                        "MerkleTrie: key remainder must be identical to path remainder"
-                    );
+                    if (keyRemainder.length != sharedNibbleLength) {
+                        revert MerkleTrieKeyRemainderMustEqualPathRemainder();
+                    }
 
                     // Our Merkle Trie is designed specifically for the purposes of the Ethereum
                     // state trie. Empty values are not allowed in the state trie, so we can safely
                     // say that if the value is empty, the key should not exist and the proof is
                     // invalid.
                     value_ = RLPReader.readBytes(currentNode.decoded[1]);
-                    require(value_.length > 0, "MerkleTrie: value length must be greater than zero (leaf)");
+                    if (value_.length <= 0) revert MerkleTrieValueLengthIsZero();
 
                     // Extra proof elements are not allowed.
-                    require(i == proof.length - 1, "MerkleTrie: value node must be last node in proof (leaf)");
+                    if (i != proof.length - 1) revert MerkleTrieValueNodeNotLastInProof();
 
                     return value_;
                 } else if (prefix == PREFIX_EXTENSION_EVEN || prefix == PREFIX_EXTENSION_ODD) {
                     // Prefix of 0 or 1 means this is an extension node. We move onto the next node
-                    // in the proof and increment the key index by the length of the path remainder
+                    // in the proof and increment the key index by the length of the path remainderr
                     // which is equal to the shared nibble length.
                     currentNodeID = _getNodeID(currentNode.decoded[1]);
                     currentKeyIndex += sharedNibbleLength;
                 } else {
-                    revert("MerkleTrie: received a node with an unknown prefix");
+                    revert MerkleTrieNodeWithUnknownPrefix();
                 }
             } else {
-                revert("MerkleTrie: received an unparseable node");
+                revert MerkleTrieUnparsableNode();
             }
         }
 
