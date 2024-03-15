@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity 0.8.11;
 
-import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
 
 
@@ -18,7 +17,6 @@ import "./interfaces/IFeeHandler.sol";
     @author ChainSafe Systems.
  */
 contract Router is Context {
-    using ECDSA for bytes32;
 
     IBridge public immutable _bridge;
     IAccessControlSegregator public _accessControl;

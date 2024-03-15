@@ -9,8 +9,7 @@ library StorageProof {
     using RLPReader for bytes;
 
     function getStorageValue(bytes32 slotHash, bytes32 storageRoot, bytes[] memory stateProof)
-        internal
-
+        internal pure
         returns (bytes32)
     {
         bytes memory valueRlpBytes =
@@ -20,7 +19,7 @@ library StorageProof {
     }
 
     function getStorageRoot(bytes[] memory proof, address contractAddress, bytes32 stateRoot)
-        internal
+        internal pure
         returns (bytes32)
     {
         bytes32 addressHash = keccak256(abi.encodePacked(contractAddress));

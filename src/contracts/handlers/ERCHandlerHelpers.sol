@@ -37,8 +37,8 @@ abstract contract ERCHandlerHelpers is IERCHandler {
     // token contract address => ERCTokenContractProperties
     mapping(address => ERCTokenContractProperties) public _tokenContractAddressToTokenProperties;
 
-    modifier onlyBridge() {
-        _onlyBridge();
+    modifier onlyBridgeRouterOrExecutor() {
+        _onlyBridgeRouterOrExecutor();
         _;
     }
 
@@ -51,7 +51,7 @@ abstract contract ERCHandlerHelpers is IERCHandler {
         _executorAddress = executorAddress;
     }
 
-    function _onlyBridge() private view {
+    function _onlyBridgeRouterOrExecutor() private view {
         require(
             msg.sender == _bridgeAddress ||
             msg.sender == _routerAddress ||
@@ -64,7 +64,7 @@ abstract contract ERCHandlerHelpers is IERCHandler {
         {_tokenContractAddressToTokenProperties[contractAddress].isBurnable} to true.
         @param contractAddress Address of contract to be used when making or executing deposits.
      */
-    function setBurnable(address contractAddress) external override onlyBridge {
+    function setBurnable(address contractAddress) external override onlyBridgeRouterOrExecutor {
         _setBurnable(contractAddress);
     }
 
