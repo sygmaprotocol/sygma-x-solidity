@@ -23,6 +23,7 @@ contract BasicFeeHandler is IFeeHandler, AccessControl {
     event FeeChanged(uint256 newFee);
 
     error IncorrectFeeSupplied(uint256);
+    error ZeroAddressProvided();
 
     modifier onlyAdmin() {
         require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "sender doesn't have admin role");
@@ -48,6 +49,11 @@ contract BasicFeeHandler is IFeeHandler, AccessControl {
         @param feeHandlerRouterAddress Contract address of previously deployed FeeHandlerRouter.
      */
     constructor(address bridgeAddress, address feeHandlerRouterAddress, address routerAddress) {
+        if (bridgeAddress == address(0) ||
+            feeHandlerRouterAddress == address(0) ||
+            routerAddress == address(0)
+        ) revert ZeroAddressProvided();
+
         _bridgeAddress = bridgeAddress;
         _feeHandlerRouterAddress = feeHandlerRouterAddress;
         _routerAddress = routerAddress;

@@ -49,6 +49,7 @@ contract Executor is Context {
 
     error EmptyProposalsArray();
     error BridgeIsPaused();
+    error ZeroAddressProvided();
     error AccessNotAllowed(address sender, bytes4 funcSig);
     error TransferHashDoesNotMatchSlotValue(bytes32 transferHash);
     error StateRootDoesNotMatch(IStateRootStorage stateRootStorage, bytes32 stateRoot);
@@ -71,6 +72,8 @@ contract Executor is Context {
         address bridge,
         address accessControl
     ) {
+        if (bridge == address(0) || accessControl == address(0)) revert ZeroAddressProvided();
+
         _bridge = IBridge(bridge);
         _domainID = _bridge._domainID();
         _accessControl = IAccessControlSegregator(accessControl);
