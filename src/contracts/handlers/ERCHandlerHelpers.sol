@@ -43,8 +43,20 @@ abstract contract ERCHandlerHelpers is IERCHandler {
         _;
     }
 
+    modifier onlyRouter() {
+        _onlyRouter();
+        _;
+    }
+
+    modifier onlyExecutor() {
+        _onlyExecutor();
+        _;
+    }
+
     /**
         @param bridgeAddress Contract address of previously deployed Bridge.
+        @param routerAddress Contract address of previously deployed Router.
+        @param executorAddress Contract address of previously deployed Executor.
      */
     constructor(address bridgeAddress, address routerAddress, address executorAddress) {
         _bridgeAddress = bridgeAddress;
@@ -53,11 +65,15 @@ abstract contract ERCHandlerHelpers is IERCHandler {
     }
 
     function _onlyBridge() private view {
-        if (
-            msg.sender != _bridgeAddress &&
-            msg.sender != _routerAddress &&
-            msg.sender != _executorAddress
-        ) revert SenderNotBridgeRouterOrExecutor();
+        require(msg.sender == _bridgeAddress, "sender must be bridge contract");
+    }
+
+    function _onlyRouter() private view {
+        require(msg.sender == _routerAddress, "sender must be router contract");
+    }
+
+    function _onlyExecutor() private view {
+        require(msg.sender == _executorAddress, "sender must be executor contract");
     }
 
     /**
