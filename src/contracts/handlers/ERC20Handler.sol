@@ -42,7 +42,7 @@ contract ERC20Handler is IHandler, ERCHandlerHelpers, ERC20Safe {
         bytes32 resourceID,
         address depositor,
         bytes calldata data
-    ) external override onlyBridge returns (bytes memory) {
+    ) external override onlyRouter returns (bytes memory) {
         uint256 amount;
         uint256 destinationRecipientAddressLen;
         bytes memory destinationRecipientAddress;
@@ -80,7 +80,7 @@ contract ERC20Handler is IHandler, ERCHandlerHelpers, ERC20Safe {
     function executeProposal(
         bytes32 resourceID,
         bytes calldata data
-    ) external override onlyBridge returns (bytes memory) {
+    ) external override onlyExecutor returns (bytes memory) {
         uint256 amount;
         uint256 lenDestinationRecipientAddress;
         bytes memory destinationRecipientAddress;
