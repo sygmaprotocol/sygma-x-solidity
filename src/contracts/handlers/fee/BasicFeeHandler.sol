@@ -72,6 +72,7 @@ contract BasicFeeHandler is IFeeHandler, AccessControl {
         @param newAdmin Address that admin role will be granted to.
      */
     function renounceAdmin(address newAdmin) external {
+        if (newAdmin == address(0)) revert ZeroAddressProvided();
         address sender = _msgSender();
         if (sender == newAdmin) revert CannotRenounceOneself();
         grantRole(DEFAULT_ADMIN_ROLE, newAdmin);

@@ -5,6 +5,7 @@ import { ethers } from "hardhat";
 
 import { assert, expect } from "chai";
 import type { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
+import { ZeroAddress } from "ethers";
 import { createResourceID, deployBridgeContracts } from "../../../helpers";
 import type {
   BasicFeeHandler,
@@ -170,6 +171,15 @@ describe("BasicFeeHandler - [admin]", () => {
     // check that former admin is no longer admin
     assert.isFalse(
       await basicFeeHandlerInstance.hasRole(ADMIN_ROLE, currentFeeHandlerAdmin),
+    );
+  });
+
+  it("BasicFeeHandler should not allow for renounced admin to be zero address", async () => {
+    await expect(
+      basicFeeHandlerInstance.renounceAdmin(ZeroAddress),
+    ).to.be.revertedWithCustomError(
+      basicFeeHandlerInstance,
+      "ZeroAddressProvided()",
     );
   });
 });
