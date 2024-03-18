@@ -106,7 +106,10 @@ describe("BasicFeeHandler - [changeFee]", () => {
         securityModel,
         0,
       ),
-    ).to.be.rejectedWith("Current fee is equal to new fee");
+    ).to.be.revertedWithCustomError(
+      basicFeeHandlerInstance,
+      "NewFeeEqualsCurrentFee",
+    );
   });
 
   it("should require admin role to change fee", async () => {
@@ -114,6 +117,6 @@ describe("BasicFeeHandler - [changeFee]", () => {
       basicFeeHandlerInstance
         .connect(nonAdminAccount)
         .changeFee(destinationDomainID, resourceID, securityModel, 1),
-    ).to.be.revertedWith("sender doesn't have admin role");
+    ).to.be.revertedWithCustomError(basicFeeHandlerInstance, "SenderNotAdmin");
   });
 });

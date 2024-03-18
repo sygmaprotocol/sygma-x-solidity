@@ -131,7 +131,10 @@ describe("PermissionlessGenericHandler - [deposit]", () => {
           invalidDepositData,
           feeData,
         ),
-    ).to.be.revertedWith("Incorrect data length");
+    ).to.be.revertedWithCustomError(
+      permissionlessGenericHandlerInstance,
+      "IncorrectDataLength",
+    );
   });
 
   it("should revert if metadata encoded depositor does not match deposit depositor", async () => {
@@ -153,7 +156,10 @@ describe("PermissionlessGenericHandler - [deposit]", () => {
           invalidDepositData,
           feeData,
         ),
-    ).to.be.revertedWith("incorrect depositor in deposit data");
+    ).to.be.revertedWithCustomError(
+      permissionlessGenericHandlerInstance,
+      "InvalidExecutioDataDepositor",
+    );
   });
 
   it("should revert if max fee exceeds 1000000", async () => {
@@ -179,6 +185,9 @@ describe("PermissionlessGenericHandler - [deposit]", () => {
             from: depositorAccount,
           },
         ),
-    ).to.be.revertedWith("requested fee too large");
+    ).to.be.revertedWithCustomError(
+      permissionlessGenericHandlerInstance,
+      "RequestedFeeTooLarge",
+    );
   });
 });

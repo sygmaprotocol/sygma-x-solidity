@@ -246,7 +246,7 @@ describe("BasicFeeHandler - [collectFee]", () => {
             value: ethers.parseEther("1.0"),
           },
         ),
-    ).to.be.rejectedWith("no FeeHandler, msg.value != 0");
+    ).to.be.revertedWithCustomError(routerInstance, "MsgValueNotZero");
   });
 
   it("deposit should pass if fee handler not set and fee not supplied", async () => {
@@ -314,7 +314,10 @@ describe("BasicFeeHandler - [collectFee]", () => {
             value: ethers.parseEther("0.5"),
           },
         ),
-    ).to.be.revertedWith("sender must be bridge or fee router contract");
+    ).to.be.revertedWithCustomError(
+      basicFeeHandlerInstance,
+      "SenderNotBridgeOrRouter",
+    );
 
     const balanceAfter = await ethers.provider.getBalance(
       await basicFeeHandlerInstance.getAddress(),
@@ -373,7 +376,10 @@ describe("BasicFeeHandler - [collectFee]", () => {
             value: ethers.parseEther("0.5"),
           },
         ),
-    ).to.be.revertedWith("sender must be router contract");
+    ).to.be.revertedWithCustomError(
+      feeHandlerRouterInstance,
+      "SenderNotRouterContract",
+    );
 
     const balanceAfter = await ethers.provider.getBalance(
       await basicFeeHandlerInstance.getAddress(),

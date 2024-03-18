@@ -9,6 +9,7 @@ import type {
   Depositor,
   ERC20Handler,
   ERC20PresetMinterPauser,
+  ERC20Safe__factory,
   Executor,
 } from "../../typechain-types";
 import {
@@ -35,6 +36,7 @@ describe("Bridge - [deposit - ERC20]", () => {
   let ERC20MintableInstance1: ERC20PresetMinterPauser;
   let ERC20MintableInstance2: ERC20PresetMinterPauser;
   let ERC20HandlerInstance: ERC20Handler;
+  let erc20SafeContract: ERC20Safe__factory;
   let depositorAccount: HardhatEthersSigner;
   let recipientAccount: HardhatEthersSigner;
 
@@ -111,6 +113,8 @@ describe("Bridge - [deposit - ERC20]", () => {
       20,
       await recipientAccount.getAddress(),
     );
+
+    erc20SafeContract = await ethers.getContractFactory("ERC20Safe");
   });
 
   it("[sanity] test depositorAccount' balance", async () => {
@@ -284,6 +288,6 @@ describe("Bridge - [deposit - ERC20]", () => {
           depositData,
           feeData,
         ),
-    ).to.be.revertedWith("ERC20: operation did not succeed");
+    ).to.be.revertedWithCustomError(erc20SafeContract, "ERC20OperationFailed");
   });
 });

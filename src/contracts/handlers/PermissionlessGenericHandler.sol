@@ -20,8 +20,14 @@ contract PermissionlessGenericHandler is IHandler {
         _;
     }
 
+    error SenderNotBridgeContract();
+    error SenderNotExecutorContract();
+    error IncorrectDataLength(uint256 dataLength);
+    error RequestedFeeTooLarge(uint256 maxFee);
+    error InvalidExecutioDataDepositor(address executioDataDepositor);
+
     function _onlyBridge() private view {
-        require(msg.sender == _bridgeAddress, "sender must be bridge contract");
+        if (msg.sender != _bridgeAddress) revert SenderNotBridgeContract();
     }
 
     modifier onlyExecutor() {
@@ -30,7 +36,7 @@ contract PermissionlessGenericHandler is IHandler {
     }
 
     function _onlyExecutor() private view {
-        require(msg.sender == _executorAddress, "sender must be executor contract");
+        if (msg.sender != _executorAddress) revert SenderNotExecutorContract();
     }
 
     /**
@@ -113,7 +119,7 @@ contract PermissionlessGenericHandler is IHandler {
             executeFuncSignature(address executionDataDepositor, uint256[] uintArray, address addr)
      */
     function deposit(bytes32 resourceID, address depositor, bytes calldata data) external pure returns (bytes memory) {
-        require(data.length >= 76, "Incorrect data length"); // 32 + 2 + 1 + 1 + 20 + 20
+        if (data.length < 76) revert IncorrectDataLength(data.length); // 32 + 2 + 1 + 1 + 20 + 20
 
         uint256 maxFee;
         uint16 lenExecuteFuncSignature;
@@ -142,8 +148,8 @@ contract PermissionlessGenericHandler is IHandler {
             )
         );
 
-        require(maxFee < MAX_FEE, "requested fee too large");
-        require(depositor == executionDataDepositor, "incorrect depositor in deposit data");
+        if (maxFee > MAX_FEE) revert RequestedFeeTooLarge(maxFee);
+        if (depositor != executionDataDepositor) revert InvalidExecutioDataDepositor(executionDataDepositor);
         return data;
     }
 

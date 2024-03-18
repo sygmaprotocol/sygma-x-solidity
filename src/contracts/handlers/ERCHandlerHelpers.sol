@@ -30,6 +30,7 @@ abstract contract ERCHandlerHelpers is IERCHandler {
 
     error ContractAddressNotWhitelisted(address contractAddress);
     error DepositAmountTooSmall(uint256 depositAmount);
+    error SenderNotBridgeRouterOrExecutor();
 
     // resourceID => token contract address
     mapping(bytes32 => address) public _resourceIDToTokenContractAddress;

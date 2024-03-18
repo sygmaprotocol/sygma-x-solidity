@@ -108,7 +108,7 @@ describe("FeeHandlerRouter", () => {
           securityModel,
           feeHandlerAccount.getAddress(),
         ),
-    ).to.be.revertedWith("sender doesn't have admin role");
+    ).to.be.revertedWithCustomError(feeHandlerRouterInstance, "SenderNotAdmin");
   });
 
   it("should successfully set whitelist on an address", async () => {
@@ -139,7 +139,7 @@ describe("FeeHandlerRouter", () => {
       feeHandlerRouterInstance
         .connect(nonAdminAccount)
         .adminSetWhitelist(await nonWhitelistedAccount.getAddress(), true),
-    ).to.be.revertedWith("sender doesn't have admin role");
+    ).to.be.revertedWithCustomError(feeHandlerRouterInstance, "SenderNotAdmin");
   });
 
   it("should return fee 0 if address whitelisted", async () => {

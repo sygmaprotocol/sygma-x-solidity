@@ -68,7 +68,10 @@ describe("AccessControlSegregator - [constructor]", () => {
         ["0xa973ec93", "0x78728c73"],
         [adminAccount],
       ),
-    ).to.be.revertedWith("array length should be equal");
+    ).to.be.revertedWithCustomError(
+      accessControlSegregatorInstance,
+      "ArrayLengthsDoNotMatch",
+    );
   });
 
   it("should grant deployer grant access rights", async () => {

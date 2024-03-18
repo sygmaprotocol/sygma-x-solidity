@@ -93,7 +93,10 @@ describe("PercentageFeeHandler - [change fee and bounds]", () => {
         securityModel,
         0,
       ),
-    ).to.be.revertedWith("Current fee is equal to new fee");
+    ).to.be.revertedWithCustomError(
+      percentageFeeHandlerInstance,
+      "NewFeeEqualsCurrentFee",
+    );
   });
 
   it("should require admin role to change fee", async () => {
@@ -101,7 +104,10 @@ describe("PercentageFeeHandler - [change fee and bounds]", () => {
       percentageFeeHandlerInstance
         .connect(nonAdminAddress)
         .changeFee(destinationDomainID, resourceID, securityModel, 1),
-    ).to.be.revertedWith("sender doesn't have admin role");
+    ).to.be.revertedWithCustomError(
+      percentageFeeHandlerInstance,
+      "SenderNotAdmin",
+    );
   });
 
   it("should set fee bounds", async () => {
@@ -131,10 +137,13 @@ describe("PercentageFeeHandler - [change fee and bounds]", () => {
     await percentageFeeHandlerInstance.changeFeeBounds(resourceID, 25, 50);
     await expect(
       percentageFeeHandlerInstance.changeFeeBounds(resourceID, 25, 50),
-    ).to.be.revertedWith("Current bounds are equal to new bounds");
+    ).to.be.revertedWithCustomError(
+      percentageFeeHandlerInstance,
+      "NewBoundsEqualCurrentBounds",
+    );
   });
 
-  it("should fail to set lower bound larger than upper bound ", async () => {
+  it("should fail to set lower bound larger than upper bound", async () => {
     const percentageFeeHandlerInstance =
       await PercentageFeeHandlerContract.deploy(
         await bridgeInstance.getAddress(),
@@ -143,7 +152,10 @@ describe("PercentageFeeHandler - [change fee and bounds]", () => {
       );
     await expect(
       percentageFeeHandlerInstance.changeFeeBounds(resourceID, 50, 25),
-    ).to.be.revertedWith("Upper bound must be larger than lower bound or 0");
+    ).to.be.revertedWithCustomError(
+      percentageFeeHandlerInstance,
+      "InvalidBoundsRatio",
+    );
   });
 
   it("should set only lower bound", async () => {
@@ -197,6 +209,9 @@ describe("PercentageFeeHandler - [change fee and bounds]", () => {
       percentageFeeHandlerInstance
         .connect(nonAdminAddress)
         .changeFeeBounds(resourceID, 50, 100),
-    ).to.be.revertedWith("sender doesn't have admin role");
+    ).to.be.revertedWithCustomError(
+      percentageFeeHandlerInstance,
+      "SenderNotAdmin",
+    );
   });
 });

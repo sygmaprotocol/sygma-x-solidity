@@ -8,13 +8,17 @@ library StorageProof {
     using RLPReader for RLPReader.RLPItem;
     using RLPReader for bytes;
 
+    error StorageValueDoesNotExist();
+    error AccountDoesNotExist();
+    error InvalidAccountListLength();
+
     function getStorageValue(bytes32 slotHash, bytes32 storageRoot, bytes[] memory stateProof)
         internal pure
         returns (bytes32)
     {
         bytes memory valueRlpBytes =
             MerkleTrie.get(abi.encodePacked(slotHash), stateProof, storageRoot);
-        require(valueRlpBytes.length > 0, "Storage value does not exist");
+        if (valueRlpBytes.length <= 0) revert StorageValueDoesNotExist();
         return valueRlpBytes.toRLPItem().readBytes32();
     }
 
@@ -24,9 +28,9 @@ library StorageProof {
     {
         bytes32 addressHash = keccak256(abi.encodePacked(contractAddress));
         bytes memory acctRlpBytes = MerkleTrie.get(abi.encodePacked(addressHash), proof, stateRoot);
-        require(acctRlpBytes.length > 0, "Account does not exist");
+        if (acctRlpBytes.length <= 0) revert AccountDoesNotExist();
         RLPReader.RLPItem[] memory acctFields = acctRlpBytes.toRLPItem().readList();
-        require(acctFields.length == 4);
+        if (acctFields.length != 4) revert InvalidAccountListLength();
         return bytes32(acctFields[2].readUint256());
     }
 }

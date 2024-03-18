@@ -39,7 +39,10 @@ describe("AccessControlSegregator - [grant access]", () => {
       accessControlSegregatorInstance
         .connect(accountWithoutAccess)
         .grantAccess(functionSignature, receivingAccessAccount),
-    ).to.be.revertedWith("sender doesn't have grant access rights");
+    ).to.be.revertedWithCustomError(
+      accessControlSegregatorInstance,
+      "SenderWithoutAccessRights",
+    );
   });
 
   it("should successfully grant access to a function", async () => {

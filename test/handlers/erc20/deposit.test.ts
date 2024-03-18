@@ -15,6 +15,7 @@ import type {
   Executor,
   ERC20Handler,
   ERC20PresetMinterPauser,
+  ERC20Safe__factory,
 } from "../../../typechain-types";
 
 describe("ERC20Handler - [Deposit ERC20]", () => {
@@ -32,6 +33,7 @@ describe("ERC20Handler - [Deposit ERC20]", () => {
   let executorInstance: Executor;
   let ERC20MintableInstance: ERC20PresetMinterPauser;
   let ERC20HandlerInstance: ERC20Handler;
+  let erc20SafeContract: ERC20Safe__factory;
   let adminAccount: HardhatEthersSigner;
   let depositorAccount: HardhatEthersSigner;
 
@@ -73,6 +75,8 @@ describe("ERC20Handler - [Deposit ERC20]", () => {
         emptySetResourceData,
       ),
     ]);
+
+    erc20SafeContract = await ethers.getContractFactory("ERC20Safe");
   });
 
   it("[sanity] depositor owns tokenAmount of ERC20", async () => {
@@ -203,7 +207,7 @@ describe("ERC20Handler - [Deposit ERC20]", () => {
           ),
           feeData,
         ),
-    ).to.be.revertedWith("ERC20: not a contract");
+    ).to.be.revertedWithCustomError(erc20SafeContract, "ERC20NonContractCall");
 
     await expect(
       routerInstance
@@ -219,6 +223,6 @@ describe("ERC20Handler - [Deposit ERC20]", () => {
           ),
           feeData,
         ),
-    ).to.be.revertedWith("ERC20: not a contract");
+    ).to.be.revertedWithCustomError(erc20SafeContract, "ERC20NonContractCall");
   });
 });

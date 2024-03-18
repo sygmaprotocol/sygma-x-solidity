@@ -149,7 +149,7 @@ describe("BasicFeeHandler - [admin]", () => {
       basicFeeHandlerInstance
         .connect(nonAdminAccount)
         .changeFee(destinationDomainID, resourceID, securityModel, fee),
-    ).to.be.revertedWith("sender doesn't have admin role");
+    ).to.be.revertedWithCustomError(basicFeeHandlerInstance, "SenderNotAdmin");
   });
 
   it("BasicFeeHandler admin should be changed to newBasicFeeHandlerAdmin", async () => {

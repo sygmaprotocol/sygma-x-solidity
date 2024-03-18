@@ -243,7 +243,7 @@ describe("BasicFeeHandler - [distributeFee]", () => {
           ],
           [payout, payout],
         ),
-    ).to.be.revertedWith("sender doesn't have admin role");
+    ).to.be.revertedWithCustomError(basicFeeHandlerInstance, "SenderNotAdmin");
   });
 
   it("should revert if addrs and amounts arrays have different length", async () => {
@@ -283,6 +283,9 @@ describe("BasicFeeHandler - [distributeFee]", () => {
         [await recipientAccount1.getAddress(), recipientAccount2.getAddress()],
         [payout, payout, payout],
       ),
-    ).to.be.revertedWith("addrs[], amounts[]: diff length");
+    ).to.be.revertedWithCustomError(
+      basicFeeHandlerInstance,
+      "AddressesAndAmountsArraysDifferentLength",
+    );
   });
 });

@@ -22,26 +22,32 @@ contract BasicFeeHandler is IFeeHandler, AccessControl {
 
     event FeeChanged(uint256 newFee);
 
+    error SenderNotBridgeOrRouter();
     error IncorrectFeeSupplied(uint256);
     error ZeroAddressProvided();
+    error SenderNotAdmin();
+    error CannotRenounceOneself();
+    error NewFeeEqualsCurrentFee(uint256 currentFee);
+    error AddressesAndAmountsArraysDifferentLength(
+        uint256 addressesLength,
+        uint256 amountsLength
+    );
+    error EtherFeeTransferFailed();
 
     modifier onlyAdmin() {
-        require(hasRole(DEFAULT_ADMIN_ROLE, msg.sender), "sender doesn't have admin role");
+        if (!hasRole(DEFAULT_ADMIN_ROLE, msg.sender)) revert SenderNotAdmin();
         _;
     }
 
-    modifier onlyBridgeOrRouter() {
-        _onlyBridgeOrRouter();
+    modifier onlyRouterOrFeeRouter() {
+        _onlyRouterOrFeeRouter();
         _;
     }
 
-    function _onlyBridgeOrRouter() private view {
-        require(
-            msg.sender == _bridgeAddress ||
-            msg.sender == _feeHandlerRouterAddress ||
-            msg.sender == _routerAddress,
-            "sender must be bridge or fee router contract"
-        );
+    function _onlyRouterOrFeeRouter() private view {
+        if (msg.sender != _feeHandlerRouterAddress &&
+            msg.sender != _routerAddress
+        ) revert SenderNotBridgeOrRouter();
     }
 
     /**
@@ -67,7 +73,7 @@ contract BasicFeeHandler is IFeeHandler, AccessControl {
      */
     function renounceAdmin(address newAdmin) external {
         address sender = _msgSender();
-        require(sender != newAdmin, "Cannot renounce oneself");
+        if (sender == newAdmin) revert CannotRenounceOneself();
         grantRole(DEFAULT_ADMIN_ROLE, newAdmin);
         renounceRole(DEFAULT_ADMIN_ROLE, sender);
     }
@@ -90,7 +96,7 @@ contract BasicFeeHandler is IFeeHandler, AccessControl {
         uint8 securityModel,
         bytes calldata depositData,
         bytes calldata feeData
-    ) external virtual payable onlyBridgeOrRouter {
+    ) external virtual payable onlyRouterOrFeeRouter {
         uint256 currentFee = _domainResourceIDSecurityModelToFee[destinationDomainID][resourceID][securityModel];
         if (msg.value != currentFee) revert IncorrectFeeSupplied(msg.value);
         emit FeeCollected(sender, fromDomainID, destinationDomainID, resourceID, currentFee, address(0));
@@ -135,7 +141,7 @@ contract BasicFeeHandler is IFeeHandler, AccessControl {
             uint256 newFee
         ) external onlyAdmin {
         uint256 currentFee = _domainResourceIDSecurityModelToFee[destinationDomainID][resourceID][securityModel];
-        require(currentFee != newFee, "Current fee is equal to new fee");
+        if (currentFee == newFee) revert NewFeeEqualsCurrentFee(currentFee);
         _domainResourceIDSecurityModelToFee[destinationDomainID][resourceID][securityModel] = newFee;
         emit FeeChanged(newFee);
     }
@@ -148,10 +154,13 @@ contract BasicFeeHandler is IFeeHandler, AccessControl {
         @param amounts Array of amounts to transfer to {addrs}.
      */
     function transferFee(address payable[] calldata addrs, uint256[] calldata amounts) external onlyAdmin {
-        require(addrs.length == amounts.length, "addrs[], amounts[]: diff length");
+        if (addrs.length != amounts.length) revert AddressesAndAmountsArraysDifferentLength(
+            addrs.length,
+            amounts.length
+        );
         for (uint256 i = 0; i < addrs.length; i++) {
             (bool success, ) = addrs[i].call{value: amounts[i]}("");
-            require(success, "Fee ether transfer failed");
+            if (!success) revert EtherFeeTransferFailed();
             emit FeeDistributed(address(0), addrs[i], amounts[i]);
         }
     }

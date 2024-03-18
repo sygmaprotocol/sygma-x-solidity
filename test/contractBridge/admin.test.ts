@@ -328,7 +328,10 @@ describe("Bridge - [admin]", () => {
       routerInstance
         .connect(tokenOwnerAccount)
         .adminSetDepositNonce(domainID, newNonce),
-    ).to.be.revertedWith("Does not allow decrements of the nonce");
+    ).to.be.revertedWithCustomError(
+      routerInstance,
+      "NonceDecrementNotAllowed(uint64)",
+    );
   });
 
   it("Should require admin role to mark nonce as used", async () => {

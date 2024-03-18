@@ -34,6 +34,8 @@ contract Router is Context {
     error AccessNotAllowed(address sender, bytes4 funcSig);
     error BridgeIsPaused();
     error ZeroAddressProvided();
+    error NonceDecrementNotAllowed(uint64 currentNonce);
+    error MsgValueNotZero();
 
     event Deposit(
         uint8 destinationDomainID,
@@ -74,7 +76,8 @@ contract Router is Context {
         @param nonce The nonce value to be set.
      */
     function adminSetDepositNonce(uint8 domainID, uint64 nonce) external onlyAllowed {
-        require(nonce > _depositCounts[domainID], "Does not allow decrements of the nonce");
+        uint64 currentNonce = _depositCounts[domainID];
+        if (nonce <= currentNonce) revert NonceDecrementNotAllowed(currentNonce);
         _depositCounts[domainID] = nonce;
     }
 
@@ -103,7 +106,7 @@ contract Router is Context {
         if (handler == address(0)) revert ResourceIDNotMappedToHandler();
 
         if (address(feeHandler) == address(0)) {
-            require(msg.value == 0, "no FeeHandler, msg.value != 0");
+            if (msg.value != 0) revert MsgValueNotZero();
         } else {
             // Reverts on failure
             feeHandler.collectFee{value: msg.value}(

@@ -25,13 +25,18 @@ contract SpectreProxy is AccessControl {
     event CommitteeRotated(uint8 sourceDomainID, uint256 slot);
     event StateRootSubmitted(uint8 sourceDomainID, uint256 slot, bytes32 stateRoot);
 
+    error SenderNotAdmin();
+    error ArrayLengthsDoNotMatch();
+    error SpectreAddressNotFound();
+    error InvalidMerkleProof();
+
     modifier onlyAdmin() {
         _onlyAdmin();
         _;
     }
 
     function _onlyAdmin() private view {
-        require(hasRole(DEFAULT_ADMIN_ROLE, _msgSender()), "sender doesn't have admin role");
+        if (!hasRole(DEFAULT_ADMIN_ROLE, _msgSender())) revert SenderNotAdmin();
     }
 
     /**
@@ -41,7 +46,7 @@ contract SpectreProxy is AccessControl {
         @param spectreAddresses List of spectre addresses.
     */
     constructor(uint8[] memory domainIDS, address[] memory spectreAddresses) {
-        require(domainIDS.length == spectreAddresses.length, "array length should be equal");
+        if (domainIDS.length != spectreAddresses.length) revert ArrayLengthsDoNotMatch();
         for (uint8 i = 0; i < domainIDS.length; i++) {
             spectreContracts[domainIDS[i]] = spectreAddresses[i];
         }
@@ -72,7 +77,7 @@ contract SpectreProxy is AccessControl {
         bytes calldata stepProof
     ) external {
         address spectreAddress = spectreContracts[sourceDomainID];
-        require(spectreAddress != address(0), "no spectre address found");
+        if (spectreAddress == address(0)) revert SpectreAddressNotFound();
 
         ISpectre spectre = ISpectre(spectreAddress);
         spectre.rotate(rotateProof, stepInput, stepProof);
@@ -95,16 +100,15 @@ contract SpectreProxy is AccessControl {
         bytes[] calldata stateRootProof
     ) external {
         address spectreAddress = spectreContracts[sourceDomainID];
-        require(spectreAddress != address(0), "no spectre address found");
+        if (spectreAddress == address(0)) revert SpectreAddressNotFound();
 
         ISpectre spectre = ISpectre(spectreAddress);
         spectre.step(input, stepProof);
 
         bytes32 executionRoot = spectre.executionPayloadRoots(input.finalizedSlot);
-        require(
-            verifyMerkleBranch(stateRoot, executionRoot, stateRootProof, STATE_ROOT_INDEX),
-            "invalid merkle proof"
-        );
+        if (!verifyMerkleBranch(stateRoot, executionRoot, stateRootProof, STATE_ROOT_INDEX)) {
+            revert InvalidMerkleProof();
+        }
 
         stateRoots[sourceDomainID][input.finalizedSlot] = stateRoot;
         emit StateRootSubmitted(sourceDomainID, input.finalizedSlot, stateRoot);
