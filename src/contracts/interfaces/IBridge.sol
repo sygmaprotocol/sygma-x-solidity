@@ -23,6 +23,18 @@ interface IBridge {
     function _feeHandler() external returns (IFeeHandler);
 
     /**
+        @notice Exposing getter for {_routerAddress} instead of forcing the use of call.
+        @return address The {_routerAddress} that is currently set for the Bridge contract.
+     */
+    function _routerAddress() external returns (address);
+
+        /**
+        @notice Exposing getter for {_executorAddress} instead of forcing the use of call.
+        @return address The {_executorAddress} that is currently set for the Bridge contract.
+     */
+    function _executorAddress() external returns (address);
+
+    /**
         @notice Exposing getter for {_accessControl} instead of forcing the use of call.
         @return IAccessControlSegregator The {_accessControl} that is currently set for the Bridge contract.
      */

@@ -20,8 +20,10 @@ contract Bridge is Pausable, Context {
     uint8 public immutable _domainID;
 
     IFeeHandler public _feeHandler;
-
     IAccessControlSegregator public _accessControl;
+    address public _executorAddress;
+    address public _routerAddress;
+
 
     // resourceID => handler address
     mapping(bytes32 => address) public _resourceIDToHandlerAddress;
@@ -139,5 +141,13 @@ contract Bridge is Pausable, Context {
     function adminWithdraw(address handlerAddress, bytes memory data) external onlyAllowed {
         IERCHandler handler = IERCHandler(handlerAddress);
         handler.withdraw(data);
+    }
+
+    function adminChangeRouterAddress(address routerAddress) external onlyAllowed {
+        _routerAddress = routerAddress;
+    }
+
+    function adminChangeExecutorAddress(address executorAddress) external onlyAllowed {
+        _executorAddress = executorAddress;
     }
 }

@@ -5,6 +5,7 @@ pragma solidity 0.8.11;
 import "@openzeppelin/contracts/token/ERC20/presets/ERC20PresetMinterPauser.sol";
 import "./handlers/ERCHandlerHelpers.sol";
 import "./interfaces/IERC20Plus.sol";
+import "./interfaces/IBridge.sol";
 
 contract NoArgument {
     event NoArgumentCalled();
@@ -58,13 +59,9 @@ abstract contract HandlerRevert is ERCHandlerHelpers {
     uint256 private _totalAmount;
 
     constructor(
-        address bridgeAddress,
-        address routerAddress,
-        address executorAddress
+        IBridge bridgeAddress
     ) ERCHandlerHelpers(
-        bridgeAddress,
-        routerAddress,
-        executorAddress
+        bridgeAddress
     ) {}
 
     function executeProposal(bytes32, bytes calldata) external view {
