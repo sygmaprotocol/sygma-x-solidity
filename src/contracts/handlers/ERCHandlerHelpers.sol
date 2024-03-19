@@ -28,9 +28,11 @@ abstract contract ERCHandlerHelpers is IERCHandler {
         Decimals decimals;
     }
 
+    error SenderNotBridgeContract();
+    error SenderNotExecutorContract();
+    error SenderNotRouterContract();
     error ContractAddressNotWhitelisted(address contractAddress);
     error DepositAmountTooSmall(uint256 depositAmount);
-    error SenderNotBridgeRouterOrExecutor();
 
     // resourceID => token contract address
     mapping(bytes32 => address) public _resourceIDToTokenContractAddress;
@@ -53,6 +55,19 @@ abstract contract ERCHandlerHelpers is IERCHandler {
         _;
     }
 
+    function _onlyBridge() private view {
+        if (msg.sender != _bridgeAddress) revert SenderNotBridgeContract();
+    }
+
+    function _onlyExecutor() private view {
+        if (msg.sender != _executorAddress) revert SenderNotExecutorContract();
+    }
+
+    function _onlyRouter() private view {
+        if (msg.sender != _routerAddress) revert SenderNotRouterContract();
+    }
+
+
     /**
         @param bridgeAddress Contract address of previously deployed Bridge.
         @param routerAddress Contract address of previously deployed Router.
@@ -62,18 +77,6 @@ abstract contract ERCHandlerHelpers is IERCHandler {
         _bridgeAddress = bridgeAddress;
         _routerAddress = routerAddress;
         _executorAddress = executorAddress;
-    }
-
-    function _onlyBridge() private view {
-        require(msg.sender == _bridgeAddress, "sender must be bridge contract");
-    }
-
-    function _onlyRouter() private view {
-        require(msg.sender == _routerAddress, "sender must be router contract");
-    }
-
-    function _onlyExecutor() private view {
-        require(msg.sender == _executorAddress, "sender must be executor contract");
     }
 
     /**
