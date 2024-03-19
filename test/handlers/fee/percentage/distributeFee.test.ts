@@ -11,12 +11,11 @@ import {
 } from "../../../helpers";
 import type {
   Bridge,
+  Router,
   ERC20Handler,
   ERC20PresetMinterPauser,
-  Executor,
   FeeHandlerRouter,
   PercentageERC20FeeHandlerEVM,
-  Router,
 } from "../../../../typechain-types";
 
 describe("PercentageFeeHandler - [distributeFee]", () => {
@@ -34,7 +33,6 @@ describe("PercentageFeeHandler - [distributeFee]", () => {
 
   let bridgeInstance: Bridge;
   let routerInstance: Router;
-  let executorInstance: Executor;
   let ERC20MintableInstance: ERC20PresetMinterPauser;
   let ERC20HandlerInstance: ERC20Handler;
   let feeHandlerRouterInstance: FeeHandlerRouter;
@@ -56,8 +54,10 @@ describe("PercentageFeeHandler - [distributeFee]", () => {
       nonAdminAccount,
     ] = await ethers.getSigners();
 
-    [bridgeInstance, routerInstance, executorInstance] =
-      await deployBridgeContracts(originDomainID, routerAddress);
+    [bridgeInstance, routerInstance] = await deployBridgeContracts(
+      originDomainID,
+      routerAddress,
+    );
     const ERC20MintableContract = await ethers.getContractFactory(
       "ERC20PresetMinterPauser",
     );
@@ -65,8 +65,6 @@ describe("PercentageFeeHandler - [distributeFee]", () => {
       await ethers.getContractFactory("ERC20Handler");
     ERC20HandlerInstance = await ERC20HandlerContract.deploy(
       await bridgeInstance.getAddress(),
-      await routerInstance.getAddress(),
-      await executorInstance.getAddress(),
     );
     ERC20MintableInstance = await ERC20MintableContract.deploy("Token", "TOK");
     const FeeHandlerRouterContract =

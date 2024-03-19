@@ -148,6 +148,14 @@ export async function deployBridgeContracts(
     await stateRootStorageInstance.getAddress(),
   ]);
 
+  await bridgeInstance.adminChangeRouterAddress(
+    await routerInstance.getAddress(),
+  );
+
+  await bridgeInstance.adminChangeExecutorAddress(
+    await executorInstance.getAddress(),
+  );
+
   return [
     bridgeInstance,
     routerInstance,

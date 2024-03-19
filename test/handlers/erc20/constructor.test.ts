@@ -5,8 +5,6 @@ import { ethers } from "hardhat";
 import { assert, expect } from "chai";
 import type {
   Bridge,
-  Router,
-  Executor,
   ERC20Handler,
   ERC20Handler__factory,
   ERC20PresetMinterPauser,
@@ -22,8 +20,6 @@ describe("ERC20Handler - [constructor]", function () {
   let initialContractAddresses: Array<string> = [];
 
   let bridgeInstance: Bridge;
-  let routerInstance: Router;
-  let executorInstance: Executor;
   let ERC20HandlerContract: ERC20Handler__factory;
   let ERC20MintableInstance1: ERC20PresetMinterPauser;
   let ERC20MintableInstance2: ERC20PresetMinterPauser;
@@ -31,8 +27,7 @@ describe("ERC20Handler - [constructor]", function () {
   let ERC20HandlerInstance: ERC20Handler;
 
   beforeEach(async () => {
-    [bridgeInstance, routerInstance, executorInstance] =
-      await deployBridgeContracts(domainID, routerAddress);
+    [bridgeInstance] = await deployBridgeContracts(domainID, routerAddress);
 
     const ERC20MintableContract = await ethers.getContractFactory(
       "ERC20PresetMinterPauser",
@@ -43,8 +38,6 @@ describe("ERC20Handler - [constructor]", function () {
     ERC20HandlerContract = await ethers.getContractFactory("ERC20Handler");
     ERC20HandlerInstance = await ERC20HandlerContract.deploy(
       await bridgeInstance.getAddress(),
-      await routerInstance.getAddress(),
-      await executorInstance.getAddress(),
     );
 
     initialResourceIDs = [
@@ -88,8 +81,6 @@ describe("ERC20Handler - [constructor]", function () {
   it("initialResourceIDs should be parsed correctly and corresponding resourceID mappings should have expected values", async () => {
     const ERC20HandlerInstance = await ERC20HandlerContract.deploy(
       await bridgeInstance.getAddress(),
-      await routerInstance.getAddress(),
-      await executorInstance.getAddress(),
     );
     for (let i = 0; i < initialResourceIDs.length; i++) {
       await expect(

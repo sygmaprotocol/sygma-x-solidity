@@ -16,7 +16,6 @@ import type {
   ERC20PresetMinterPauser,
   FeeHandlerRouter,
   Router,
-  Executor,
 } from "../../../../typechain-types";
 
 describe("BasicFeeHandler - [calculateFee]", () => {
@@ -30,7 +29,6 @@ describe("BasicFeeHandler - [calculateFee]", () => {
 
   let bridgeInstance: Bridge;
   let routerInstance: Router;
-  let executorInstance: Executor;
   let ERC20MintableInstance: ERC20PresetMinterPauser;
   let ERC20HandlerInstance: ERC20Handler;
   let feeHandlerRouterInstance: FeeHandlerRouter;
@@ -44,8 +42,10 @@ describe("BasicFeeHandler - [calculateFee]", () => {
   beforeEach(async () => {
     [, , recipientAccount, relayer1] = await ethers.getSigners();
 
-    [bridgeInstance, routerInstance, executorInstance] =
-      await deployBridgeContracts(originDomainID, routerAddress);
+    [bridgeInstance, routerInstance] = await deployBridgeContracts(
+      originDomainID,
+      routerAddress,
+    );
     const ERC20MintableContract = await ethers.getContractFactory(
       "ERC20PresetMinterPauser",
     );
@@ -54,8 +54,6 @@ describe("BasicFeeHandler - [calculateFee]", () => {
       await ethers.getContractFactory("ERC20Handler");
     ERC20HandlerInstance = await ERC20HandlerContract.deploy(
       await bridgeInstance.getAddress(),
-      await routerInstance.getAddress(),
-      await executorInstance.getAddress(),
     );
     const FeeHandlerRouterContract =
       await ethers.getContractFactory("FeeHandlerRouter");

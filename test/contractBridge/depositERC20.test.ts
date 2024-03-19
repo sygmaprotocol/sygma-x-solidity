@@ -6,11 +6,10 @@ import { assert, expect } from "chai";
 import { ethers } from "hardhat";
 import type {
   Bridge,
-  Depositor,
+  Router,
   ERC20Handler,
   ERC20PresetMinterPauser,
   ERC20Safe__factory,
-  Executor,
 } from "../../typechain-types";
 import {
   createERCDepositData,
@@ -31,8 +30,7 @@ describe("Bridge - [deposit - ERC20]", () => {
   const routerAddress = "0x1a60efB48c61A79515B170CA61C84DD6dCA80418";
 
   let bridgeInstance: Bridge;
-  let routerInstance: Depositor;
-  let executorInstance: Executor;
+  let routerInstance: Router;
   let ERC20MintableInstance1: ERC20PresetMinterPauser;
   let ERC20MintableInstance2: ERC20PresetMinterPauser;
   let ERC20HandlerInstance: ERC20Handler;
@@ -47,8 +45,10 @@ describe("Bridge - [deposit - ERC20]", () => {
   beforeEach(async () => {
     [, depositorAccount, recipientAccount] = await ethers.getSigners();
 
-    [bridgeInstance, routerInstance, executorInstance] =
-      await deployBridgeContracts(originDomainID, routerAddress);
+    [bridgeInstance, routerInstance] = await deployBridgeContracts(
+      originDomainID,
+      routerAddress,
+    );
     const ERC20MintableContract = await ethers.getContractFactory(
       "ERC20PresetMinterPauser",
     );
@@ -64,8 +64,6 @@ describe("Bridge - [deposit - ERC20]", () => {
       await ethers.getContractFactory("ERC20Handler");
     ERC20HandlerInstance = await ERC20HandlerContract.deploy(
       await bridgeInstance.getAddress(),
-      await routerInstance.getAddress(),
-      await executorInstance.getAddress(),
     );
 
     resourceID1 = createResourceID(

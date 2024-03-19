@@ -7,8 +7,6 @@ import type { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signer
 import { deployBridgeContracts, createResourceID } from "../../helpers";
 import type {
   Bridge,
-  Router,
-  Executor,
   ERC20Handler,
   ERC20PresetMinterPauser,
 } from "../../../typechain-types";
@@ -17,8 +15,6 @@ describe("ERC20Handler - [decimals]", () => {
   const originDomainID = 1;
 
   let bridgeInstance: Bridge;
-  let routerInstance: Router;
-  let executorInstance: Executor;
   let ERC20MintableInstance: ERC20PresetMinterPauser;
   let ERC20HandlerInstance: ERC20Handler;
   let depositorAccount: HardhatEthersSigner;
@@ -33,8 +29,10 @@ describe("ERC20Handler - [decimals]", () => {
   beforeEach(async () => {
     [, depositorAccount] = await ethers.getSigners();
 
-    [bridgeInstance, routerInstance, executorInstance] =
-      await deployBridgeContracts(originDomainID, routerAddress);
+    [bridgeInstance] = await deployBridgeContracts(
+      originDomainID,
+      routerAddress,
+    );
     const ERC20MintableContract = await ethers.getContractFactory(
       "ERC20PresetMinterPauserDecimals",
     );
@@ -47,8 +45,6 @@ describe("ERC20Handler - [decimals]", () => {
       await ethers.getContractFactory("ERC20Handler");
     ERC20HandlerInstance = await ERC20HandlerContract.deploy(
       await bridgeInstance.getAddress(),
-      await routerInstance.getAddress(),
-      await executorInstance.getAddress(),
     );
 
     resourceID = createResourceID(

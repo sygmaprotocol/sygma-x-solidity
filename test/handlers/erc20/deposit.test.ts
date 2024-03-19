@@ -12,7 +12,6 @@ import {
 import type {
   Bridge,
   Router,
-  Executor,
   ERC20Handler,
   ERC20PresetMinterPauser,
   ERC20Safe__factory,
@@ -30,7 +29,6 @@ describe("ERC20Handler - [Deposit ERC20]", () => {
 
   let bridgeInstance: Bridge;
   let routerInstance: Router;
-  let executorInstance: Executor;
   let ERC20MintableInstance: ERC20PresetMinterPauser;
   let ERC20HandlerInstance: ERC20Handler;
   let erc20SafeContract: ERC20Safe__factory;
@@ -42,8 +40,10 @@ describe("ERC20Handler - [Deposit ERC20]", () => {
   beforeEach(async () => {
     [adminAccount, depositorAccount] = await ethers.getSigners();
 
-    [bridgeInstance, routerInstance, executorInstance] =
-      await deployBridgeContracts(originDomainID, routerAddress);
+    [bridgeInstance, routerInstance] = await deployBridgeContracts(
+      originDomainID,
+      routerAddress,
+    );
     const ERC20MintableContract = await ethers.getContractFactory(
       "ERC20PresetMinterPauser",
     );
@@ -52,8 +52,6 @@ describe("ERC20Handler - [Deposit ERC20]", () => {
       await ethers.getContractFactory("ERC20Handler");
     ERC20HandlerInstance = await ERC20HandlerContract.deploy(
       await bridgeInstance.getAddress(),
-      await routerInstance.getAddress(),
-      await executorInstance.getAddress(),
     );
 
     resourceID = createResourceID(

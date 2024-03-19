@@ -129,13 +129,9 @@ describe("E2E ERC20 - Two EVM Chains, one with decimal places == 18, other with 
       await ethers.getContractFactory("ERC20Handler");
     originERC20HandlerInstance = await ERC20HandlerContract.deploy(
       await originBridgeInstance.getAddress(),
-      await originRouterInstance.getAddress(),
-      await originExecutorInstance.getAddress(),
     );
     destinationERC20HandlerInstance = await ERC20HandlerContract.deploy(
       await destinationBridgeInstance.getAddress(),
-      await destinationRouterInstance.getAddress(),
-      await destinationExecutorInstance.getAddress(),
     );
 
     originResourceID =

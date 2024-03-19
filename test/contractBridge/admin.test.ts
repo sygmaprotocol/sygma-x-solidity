@@ -54,8 +54,6 @@ describe("Bridge - [admin]", () => {
     ERC20HandlerContract = await ethers.getContractFactory("ERC20Handler");
     ERC20HandlerInstance = await ERC20HandlerContract.deploy(
       await bridgeInstance.getAddress(),
-      await routerInstance.getAddress(),
-      await executorInstance.getAddress(),
     );
   });
 
@@ -116,8 +114,6 @@ describe("Bridge - [admin]", () => {
     );
     const ERC20HandlerInstance = await ERC20HandlerContract.deploy(
       await bridgeInstance.getAddress(),
-      await routerInstance.getAddress(),
-      await executorInstance.getAddress(),
     );
 
     await expect(
@@ -189,8 +185,6 @@ describe("Bridge - [admin]", () => {
     );
     const ERC20HandlerInstance = await ERC20HandlerContract.deploy(
       await bridgeInstance.getAddress(),
-      await routerInstance.getAddress(),
-      await executorInstance.getAddress(),
     );
 
     await expect(
@@ -244,8 +238,6 @@ describe("Bridge - [admin]", () => {
     );
     const ERC20HandlerInstance = await ERC20HandlerContract.deploy(
       await bridgeInstance.getAddress(),
-      await routerInstance.getAddress(),
-      await executorInstance.getAddress(),
     );
 
     await expect(
@@ -387,5 +379,29 @@ describe("Bridge - [admin]", () => {
     await expect(
       executorInstance.connect(tokenOwnerAccount).adminChangeSlotIndex(3, 1),
     ).not.to.be.reverted;
+  });
+
+  it("Should require admin role to change router address", async () => {
+    await expect(
+      bridgeInstance
+        .connect(nonAdminAccount)
+        .adminChangeRouterAddress("0x388C818CA8B9251b393131C08a736A67ccB19297"),
+    ).to.be.revertedWithCustomError(
+      routerInstance,
+      "AccessNotAllowed(address,bytes4)",
+    );
+  });
+
+  it("Should require admin role to change executor address", async () => {
+    await expect(
+      bridgeInstance
+        .connect(nonAdminAccount)
+        .adminChangeExecutorAddress(
+          "0x388C818CA8B9251b393131C08a736A67ccB19297",
+        ),
+    ).to.be.revertedWithCustomError(
+      routerInstance,
+      "AccessNotAllowed(address,bytes4)",
+    );
   });
 });
