@@ -4,6 +4,7 @@
 import type { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 import { assert, expect } from "chai";
 import { ethers } from "hardhat";
+
 import type {
   AccessControlSegregator,
   AccessControlSegregator__factory,

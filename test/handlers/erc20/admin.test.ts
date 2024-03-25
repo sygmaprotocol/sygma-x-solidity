@@ -1,9 +1,10 @@
 // The Licensed Work is (c) 2022 Sygma
 // SPDX-License-Identifier: LGPL-3.0-only
 
-import { ethers } from "hardhat";
-import { expect } from "chai";
 import type { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
+import { expect } from "chai";
+import { ethers } from "hardhat";
+
 import type {
   Bridge,
   Router,

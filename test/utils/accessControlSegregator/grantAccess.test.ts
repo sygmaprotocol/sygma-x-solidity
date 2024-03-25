@@ -1,9 +1,10 @@
 // The Licensed Work is (c) 2022 Sygma
 // SPDX-License-Identifier: LGPL-3.0-only
 
+import type { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 import { assert, expect } from "chai";
 import { ethers } from "hardhat";
-import type { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
+
 import type { AccessControlSegregator } from "../../../typechain-types";
 
 describe("AccessControlSegregator - [grant access]", () => {

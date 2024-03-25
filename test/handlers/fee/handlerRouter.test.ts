@@ -1,20 +1,21 @@
 // The Licensed Work is (c) 2022 Sygma
 // SPDX-License-Identifier: LGPL-3.0-only
 
+import type { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 import { assert, expect } from "chai";
 import { ethers } from "hardhat";
-import type { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
-import {
-  createResourceID,
-  createERCDepositData,
-  deployBridgeContracts,
-} from "../../helpers";
+
 import type {
   BasicFeeHandler,
   ERC20PresetMinterPauser,
   FeeHandlerRouter,
   Router,
 } from "../../../typechain-types";
+import {
+  createResourceID,
+  createERCDepositData,
+  deployBridgeContracts,
+} from "../../helpers";
 
 describe("FeeHandlerRouter", () => {
   const originDomainID = 1;

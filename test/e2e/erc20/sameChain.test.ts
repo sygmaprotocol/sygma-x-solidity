@@ -1,12 +1,9 @@
-import type { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 // The Licensed Work is (c) 2022 Sygma
 // SPDX-License-Identifier: LGPL-3.0-only
 
-import { ethers } from "hardhat";
+import type { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 import { assert, expect } from "chai";
-import { deployBridgeContracts, createERCDepositData } from "../../helpers";
-
-import { accountProof1, storageProof1 } from "../../testingProofs";
+import { ethers } from "hardhat";
 
 import type {
   Bridge,
@@ -16,6 +13,8 @@ import type {
   ERC20PresetMinterPauser,
   StateRootStorage,
 } from "../../../typechain-types";
+import { deployBridgeContracts, createERCDepositData } from "../../helpers";
+import { accountProof1, storageProof1 } from "../../testingProofs";
 
 describe("E2E ERC20 - Same Chain", () => {
   const originDomainID = 1;

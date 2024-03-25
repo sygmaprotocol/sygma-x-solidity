@@ -1,14 +1,10 @@
 // The Licensed Work is (c) 2022 Sygma
 // SPDX-License-Identifier: LGPL-3.0-only
 
-import { ethers } from "hardhat";
-import { assert, expect } from "chai";
 import type { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
-import {
-  deployBridgeContracts,
-  createResourceID,
-  createERCWithdrawData,
-} from "../helpers";
+import { assert, expect } from "chai";
+import { ethers } from "hardhat";
+
 import type {
   Bridge,
   Router,
@@ -18,6 +14,11 @@ import type {
   ERC20PresetMinterPauser__factory,
   Executor,
 } from "../../typechain-types";
+import {
+  deployBridgeContracts,
+  createResourceID,
+  createERCWithdrawData,
+} from "../helpers";
 
 // This test does NOT include all getter methods, just
 // getters that should work with only the constructor called

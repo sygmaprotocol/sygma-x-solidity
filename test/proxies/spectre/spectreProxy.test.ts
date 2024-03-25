@@ -1,6 +1,7 @@
+import type { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
 import { assert, expect } from "chai";
 import { ethers } from "hardhat";
-import type { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
+
 import type { ISpectre, SpectreProxy } from "../../../typechain-types";
 
 describe("Spectre Proxy", () => {

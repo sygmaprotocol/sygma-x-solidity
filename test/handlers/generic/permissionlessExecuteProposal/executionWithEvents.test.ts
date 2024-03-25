@@ -1,9 +1,18 @@
 // The Licensed Work is (c) 2022 Sygma
 // SPDX-License-Identifier: LGPL-3.0-only
 
-import { ethers } from "hardhat";
-import { assert, expect } from "chai";
 import type { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
+import { assert, expect } from "chai";
+import { ethers } from "hardhat";
+
+import type {
+  Bridge,
+  Router,
+  Executor,
+  StateRootStorage,
+  PermissionlessGenericHandler,
+  TestStore,
+} from "../../../../typechain-types";
 import {
   deployBridgeContracts,
   constructGenericHandlerSetResourceData,
@@ -13,14 +22,6 @@ import {
   deployMockTestContracts,
 } from "../../../helpers";
 import { gmpStorageProof1, gmpAccountProof1 } from "../../../testingProofs";
-import type {
-  Bridge,
-  Router,
-  Executor,
-  StateRootStorage,
-  PermissionlessGenericHandler,
-  TestStore,
-} from "../../../../typechain-types";
 
 describe("PermissionlessGenericHandler - [Execute Proposal] - TestStore", () => {
   const originDomainID = 1;
