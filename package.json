@@ -1,5 +1,5 @@
 {
-  "name": "sygma-x-solidity",
+  "name": "@buildwithsygma/sygma-x-solidity",
   "version": "1.0.0",
   "main": "index.js",
   "author": "Sygma",

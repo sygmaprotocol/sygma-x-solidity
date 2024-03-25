@@ -14,7 +14,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 contract SpectreProxy is AccessControl {
 
     uint8 public constant STATE_ROOT_INDEX = 34;
-    uint8 public constant STATE_ROOT_DEPTH = 4;
+    uint8 public constant STATE_ROOT_DEPTH = 5;
 
     // source domainID => slot => state root
     mapping(uint8 => mapping(uint256 => bytes32)) public stateRoots;
