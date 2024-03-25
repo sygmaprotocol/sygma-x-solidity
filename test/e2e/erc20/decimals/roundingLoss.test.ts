@@ -1,22 +1,9 @@
 // The Licensed Work is (c) 2022 Sygma
 // SPDX-License-Identifier: LGPL-3.0-only
 
-import { ethers } from "hardhat";
-import { assert, expect } from "chai";
 import type { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
-import {
-  deployBridgeContracts,
-  createERCDepositData,
-  toHex,
-  getDepositEventData,
-} from "../../../helpers";
-
-import {
-  accountProof7,
-  storageProof7,
-  accountProof8,
-  storageProof8,
-} from "../../../testingProofs";
+import { assert, expect } from "chai";
+import { ethers } from "hardhat";
 
 import type {
   Bridge,
@@ -26,6 +13,18 @@ import type {
   Executor,
   StateRootStorage,
 } from "../../../../typechain-types";
+import {
+  deployBridgeContracts,
+  createERCDepositData,
+  toHex,
+  getDepositEventData,
+} from "../../../helpers";
+import {
+  accountProof7,
+  storageProof7,
+  accountProof8,
+  storageProof8,
+} from "../../../testingProofs";
 
 describe("E2E ERC20 - Two EVM Chains both with decimal places != 18 with rounding loss", () => {
   const originDomainID = 1;

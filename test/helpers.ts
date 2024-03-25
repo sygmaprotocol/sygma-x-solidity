@@ -1,8 +1,9 @@
 // The Licensed Work is (c) 2022 Sygma
 // SPDX-License-Identifier: LGPL-3.0-only
 
-import { ethers, network } from "hardhat";
 import type { TransactionReceipt, TransactionResponse } from "ethers";
+import { ethers, network } from "hardhat";
+
 import { generateAccessControlFuncSignatures } from "../scripts/utils";
 import type {
   Bridge,

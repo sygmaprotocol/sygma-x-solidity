@@ -1,12 +1,9 @@
 // The Licensed Work is (c) 2022 Sygma
 // SPDX-License-Identifier: LGPL-3.0-only
 
-import { ethers } from "hardhat";
-import { assert, expect } from "chai";
 import type { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
-import { deployBridgeContracts, createERCDepositData } from "../helpers";
-
-import { accountProof1, storageProof1 } from "../testingProofs";
+import { assert, expect } from "chai";
+import { ethers } from "hardhat";
 
 import type {
   Bridge,
@@ -17,6 +14,8 @@ import type {
   StateRootStorage,
   MerkleTrie__factory,
 } from "../../typechain-types";
+import { deployBridgeContracts, createERCDepositData } from "../helpers";
+import { accountProof1, storageProof1 } from "../testingProofs";
 
 describe("Bridge - [execute proposal - ERC20]", () => {
   const originDomainID = 1;

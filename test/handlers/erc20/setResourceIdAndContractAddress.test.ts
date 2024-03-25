@@ -1,9 +1,9 @@
 // The Licensed Work is (c) 2022 Sygma
 // SPDX-License-Identifier: LGPL-3.0-only
 
-import { ethers } from "hardhat";
 import { assert } from "chai";
-import { createResourceID, deployBridgeContracts } from "../../helpers";
+import { ethers } from "hardhat";
+
 import type {
   Bridge,
   Router,
@@ -11,6 +11,7 @@ import type {
   ERC20Handler,
   ERC20PresetMinterPauser,
 } from "../../../typechain-types";
+import { createResourceID, deployBridgeContracts } from "../../helpers";
 
 describe("ERC20Handler - [setResourceIDAndContractAddress]", () => {
   const domainID = 1;

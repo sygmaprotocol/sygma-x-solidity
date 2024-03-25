@@ -1,8 +1,8 @@
 // The Licensed Work is (c) 2022 Sygma
 // SPDX-License-Identifier: LGPL-3.0-only
 
-import { ethers } from "hardhat";
 import { expect } from "chai";
+import { ethers } from "hardhat";
 
 describe("Bridge/Router/Executor - [constructor]", () => {
   const domainID = 1;
