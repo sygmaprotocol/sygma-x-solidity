@@ -1,17 +1,17 @@
 {
   "name": "@buildwithsygma/sygma-x-solidity",
-  "version": "1.0.0",
+  "version": "2.4.0",
   "main": "index.js",
   "author": "Sygma",
   "license": "BUSL-1.1",
-  "files":[
+  "files": [
     "artifacts",
     "typechain-types"
   ],
   "scripts": {
     "compile": "npx hardhat compile",
     "coverage": "npx hardhat coverage",
-    "deploy":"npx hardhat deploy --network",
+    "deploy": "npx hardhat deploy --network",
     "lint:typescript": "eslint 'test/**/*.ts' 'scripts/**/*.ts'",
     "lint:typescript:fix": "prettier --config .prettierrc.json --write 'scripts/**/*.ts' 'test/**/*.ts' 'hardhat.config.ts'",
     "lint:solidity": "npx solhint 'src/contracts/**/*.sol'",
