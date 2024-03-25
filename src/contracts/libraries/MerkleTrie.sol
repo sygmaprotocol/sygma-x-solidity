@@ -33,6 +33,7 @@ library MerkleTrie {
     error MerkleTrieValueLengthIsZero();
     error MerkleTrieNodeWithUnknownPrefix();
     error MerkleTrieUnparsableNode();
+    error MerkleTrieRanOutOfProofElements();
 
     /// @notice Determines the number of elements per branch node.
     uint256 internal constant TREE_RADIX = 16;
@@ -185,7 +186,7 @@ library MerkleTrie {
             }
         }
 
-        revert("MerkleTrie: ran out of proof elements");
+        revert MerkleTrieRanOutOfProofElements();
     }
 
     /// @notice Parses an array of proof elements into a new array that contains both the original

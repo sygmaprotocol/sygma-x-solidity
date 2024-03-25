@@ -66,34 +66,49 @@ describe("ERC20Handler - [constructor]", function () {
   it("[sanity] should revert if deposit is not called by Router", async () => {
     await expect(
       ERC20HandlerInstance.deposit(resourceID, depositorAccount, depositData),
-    ).to.be.revertedWith("sender must be router contract");
+    ).to.be.revertedWithCustomError(
+      ERC20HandlerInstance,
+      "SenderNotRouterContract()",
+    );
   });
 
-  it("[sanity] should revert if deposit is not called by Router", async () => {
+  it("[sanity] should revert if execution is not called by Executor", async () => {
     await expect(
       ERC20HandlerInstance.executeProposal(resourceID, depositData),
-    ).to.be.revertedWith("sender must be executor contract");
+    ).to.be.revertedWithCustomError(
+      ERC20HandlerInstance,
+      "SenderNotExecutorContract()",
+    );
   });
 
-  it("[sanity] should revert if deposit is not called by Router", async () => {
+  it("[sanity] should revert if setResource is not called by Bridge", async () => {
     await expect(
       ERC20HandlerInstance.setResource(
         resourceID,
         await ERC20MintableInstance.getAddress(),
         "0x",
       ),
-    ).to.be.revertedWith("sender must be bridge contract");
+    ).to.be.revertedWithCustomError(
+      ERC20HandlerInstance,
+      "SenderNotBridgeContract()",
+    );
   });
 
-  it("[sanity] should revert if deposit is not called by Router", async () => {
+  it("[sanity] should revert if setBurnable is not called by Bridge", async () => {
     await expect(
       ERC20HandlerInstance.setBurnable(await ERC20HandlerInstance.getAddress()),
-    ).to.be.revertedWith("sender must be bridge contract");
+    ).to.be.revertedWithCustomError(
+      ERC20HandlerInstance,
+      "SenderNotBridgeContract()",
+    );
   });
 
-  it("[sanity] should revert if deposit is not called by Router", async () => {
-    await expect(ERC20HandlerInstance.withdraw("0x")).to.be.revertedWith(
-      "sender must be bridge contract",
+  it("[sanity] should revert if withdraw is not called by Bridge", async () => {
+    await expect(
+      ERC20HandlerInstance.withdraw("0x"),
+    ).to.be.revertedWithCustomError(
+      ERC20HandlerInstance,
+      "SenderNotBridgeContract()",
     );
   });
 });
