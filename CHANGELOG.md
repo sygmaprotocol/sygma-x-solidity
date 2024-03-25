@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.4.2](https://github.com/sygmaprotocol/sygma-x-solidity/compare/v2.4.1...v2.4.2) (2024-03-25)
+
+
+### Bug Fixes
+
+* remove ignore optional when releasing ([#50](https://github.com/sygmaprotocol/sygma-x-solidity/issues/50)) ([8630892](https://github.com/sygmaprotocol/sygma-x-solidity/commit/86308923b57a68eb7583ab4e7de9b32e4ad22989))
+
 ## [2.4.1](https://github.com/sygmaprotocol/sygma-x-solidity/compare/v2.4.0...v2.4.1) (2024-03-25)
 
 
