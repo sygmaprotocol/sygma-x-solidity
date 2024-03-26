@@ -1,15 +1,15 @@
 // The Licensed Work is (c) 2022 Sygma
 // SPDX-License-Identifier: LGPL-3.0-only
+import type { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
+import { assert } from "chai";
 import { ethers } from "hardhat";
 
-import { assert } from "chai";
-import type { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
-import { deployBridgeContracts, createResourceID } from "../../helpers";
 import type {
   Bridge,
   ERC20Handler,
   ERC20PresetMinterPauser,
 } from "../../../typechain-types";
+import { deployBridgeContracts, createResourceID } from "../../helpers";
 
 describe("ERC20Handler - [Deposit Burn ERC20]", () => {
   const domainID = 1;

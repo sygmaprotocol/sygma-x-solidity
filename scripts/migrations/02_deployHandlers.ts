@@ -1,5 +1,6 @@
-import type { DeployFunction } from "hardhat-deploy/dist/types";
 import type { HardhatRuntimeEnvironment } from "hardhat/types";
+import type { DeployFunction } from "hardhat-deploy/dist/types";
+
 import { verifyContract } from "../utils";
 
 const deployFunc: DeployFunction = async function ({

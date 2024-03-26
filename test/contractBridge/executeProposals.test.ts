@@ -1,11 +1,9 @@
 // The Licensed Work is (c) 2022 Sygma
 // SPDX-License-Identifier: LGPL-3.0-only
 
-import { ethers } from "hardhat";
-import { assert, expect } from "chai";
 import type { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
-import { deployBridgeContracts, createERCDepositData } from "../helpers";
-import { accountProof1, storageProof1 } from "../testingProofs";
+import { assert, expect } from "chai";
+import { ethers } from "hardhat";
 
 import type {
   Bridge,
@@ -15,6 +13,8 @@ import type {
   ERC20PresetMinterPauser,
   StateRootStorage,
 } from "../../typechain-types";
+import { deployBridgeContracts, createERCDepositData } from "../helpers";
+import { accountProof1, storageProof1 } from "../testingProofs";
 
 describe("Bridge - [execute proposals]", () => {
   const originDomainID = 1;
@@ -143,6 +143,7 @@ describe("Bridge - [execute proposals]", () => {
     await expect(executeTx).not.to.be.reverted;
 
     // check that deposit nonces had been marked as used in bitmap
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     expectedDepositNonces.map(async (_, index) => {
       assert.isTrue(
         await executorInstance.isProposalExecuted(
@@ -182,6 +183,7 @@ describe("Bridge - [execute proposals]", () => {
     await expect(executeTx).not.to.be.reverted;
 
     // check that deposit nonces had been marked as used in bitmap
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     expectedDepositNonces.map(async (_, index) => {
       assert.isTrue(
         await executorInstance.isProposalExecuted(
@@ -250,6 +252,7 @@ describe("Bridge - [execute proposals]", () => {
       );
 
     // check that deposit nonces had been marked as used in bitmap
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     expectedDepositNonces.map(async (_, index) => {
       assert.isTrue(
         await executorInstance.isProposalExecuted(

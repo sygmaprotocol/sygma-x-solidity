@@ -1,6 +1,6 @@
 import { ethers } from "hardhat";
-import type { DeployFunction } from "hardhat-deploy/dist/types";
 import type { HardhatRuntimeEnvironment } from "hardhat/types";
+import type { DeployFunction } from "hardhat-deploy/dist/types";
 
 import { generateAccessControlFuncSignatures, verifyContract } from "../utils";
 

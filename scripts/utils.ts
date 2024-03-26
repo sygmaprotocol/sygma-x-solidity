@@ -1,8 +1,9 @@
 import fs from "fs";
 import { resolve } from "path";
-import { deployments, run } from "hardhat";
+
 import { keccak256, ContractFactory } from "ethers";
 import type { InterfaceAbi, Fragment } from "ethers";
+import { deployments, run } from "hardhat";
 import type { DeployResult } from "hardhat-deploy/dist/types";
 
 export function generateAccessControlFuncSignatures(contracts: Array<string>): {
