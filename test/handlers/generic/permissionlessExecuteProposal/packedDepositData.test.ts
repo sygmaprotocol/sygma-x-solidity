@@ -68,7 +68,6 @@ describe("PermissionlessGenericHandler - [Execute Proposal] - packed deposit dat
     permissionlessGenericHandlerInstance =
       await PermissionlessGenericHandlerContract.deploy(
         await bridgeInstance.getAddress(),
-        await executorInstance.getAddress(),
       );
 
     [testStoreInstance, testDepositInstance] = await deployMockTestContracts(

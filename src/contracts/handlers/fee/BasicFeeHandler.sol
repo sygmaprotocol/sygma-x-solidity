@@ -3,6 +3,7 @@
 pragma solidity 0.8.11;
 
 import "../../interfaces/IFeeHandler.sol";
+import "../../interfaces/IBridge.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
 import "../FeeHandlerRouter.sol";
@@ -13,9 +14,8 @@ import "../FeeHandlerRouter.sol";
     @notice This contract is intended to be used with the Bridge contract.
  */
 contract BasicFeeHandler is IFeeHandler, AccessControl {
-    address public immutable _bridgeAddress;
+    IBridge public immutable _bridge;
     address public immutable _feeHandlerRouterAddress;
-    address public immutable _routerAddress;
     // domainID => resourceID => securityModel => fee
     mapping (uint8 => mapping(bytes32 => mapping(uint8 => uint256))) public _domainResourceIDSecurityModelToFee;
 
@@ -44,25 +44,23 @@ contract BasicFeeHandler is IFeeHandler, AccessControl {
         _;
     }
 
-    function _onlyRouterOrFeeRouter() private view {
+    function _onlyRouterOrFeeRouter() private {
         if (msg.sender != _feeHandlerRouterAddress &&
-            msg.sender != _routerAddress
+            msg.sender != _bridge._routerAddress()
         ) revert SenderNotBridgeOrRouter();
     }
 
     /**
-        @param bridgeAddress Contract address of previously deployed Bridge.
+        @param bridge Contract address of previously deployed Bridge.
         @param feeHandlerRouterAddress Contract address of previously deployed FeeHandlerRouter.
      */
-    constructor(address bridgeAddress, address feeHandlerRouterAddress, address routerAddress) {
-        if (bridgeAddress == address(0) ||
-            feeHandlerRouterAddress == address(0) ||
-            routerAddress == address(0)
+    constructor(IBridge bridge, address feeHandlerRouterAddress) {
+        if (address(bridge) == address(0) ||
+            feeHandlerRouterAddress == address(0)
         ) revert ZeroAddressProvided();
 
-        _bridgeAddress = bridgeAddress;
+        _bridge = bridge;
         _feeHandlerRouterAddress = feeHandlerRouterAddress;
-        _routerAddress = routerAddress;
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 

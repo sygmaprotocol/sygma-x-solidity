@@ -11,7 +11,6 @@ import type {
   FeeHandlerRouter,
   PercentageERC20FeeHandlerEVM,
   PercentageERC20FeeHandlerEVM__factory,
-  Router,
 } from "../../../../typechain-types";
 import { deployBridgeContracts, createResourceID } from "../../../helpers";
 
@@ -22,7 +21,6 @@ describe("PercentageFeeHandler - [change fee and bounds]", () => {
   const securityModel = 1;
 
   let bridgeInstance: Bridge;
-  let routerInstance: Router;
   let percentageFeeHandlerInstance: PercentageERC20FeeHandlerEVM;
   let ERC20MintableInstance: ERC20PresetMinterPauser;
   let PercentageFeeHandlerContract: PercentageERC20FeeHandlerEVM__factory;
@@ -33,7 +31,7 @@ describe("PercentageFeeHandler - [change fee and bounds]", () => {
   beforeEach(async () => {
     [, nonAdminAddress] = await ethers.getSigners();
 
-    [bridgeInstance, routerInstance] = await deployBridgeContracts(
+    [bridgeInstance] = await deployBridgeContracts(
       originDomainID,
       routerAddress,
     );
@@ -52,7 +50,6 @@ describe("PercentageFeeHandler - [change fee and bounds]", () => {
     percentageFeeHandlerInstance = await PercentageFeeHandlerContract.deploy(
       await bridgeInstance.getAddress(),
       await feeHandlerRouterInstance.getAddress(),
-      await routerInstance.getAddress(),
     );
 
     resourceID = createResourceID(
@@ -133,7 +130,6 @@ describe("PercentageFeeHandler - [change fee and bounds]", () => {
       await PercentageFeeHandlerContract.deploy(
         await bridgeInstance.getAddress(),
         await feeHandlerRouterInstance.getAddress(),
-        await routerInstance.getAddress(),
       );
     await percentageFeeHandlerInstance.changeFeeBounds(resourceID, 25, 50);
     await expect(
@@ -149,7 +145,6 @@ describe("PercentageFeeHandler - [change fee and bounds]", () => {
       await PercentageFeeHandlerContract.deploy(
         await bridgeInstance.getAddress(),
         await feeHandlerRouterInstance.getAddress(),
-        await routerInstance.getAddress(),
       );
     await expect(
       percentageFeeHandlerInstance.changeFeeBounds(resourceID, 50, 25),
@@ -165,7 +160,6 @@ describe("PercentageFeeHandler - [change fee and bounds]", () => {
       await PercentageFeeHandlerContract.deploy(
         await bridgeInstance.getAddress(),
         await feeHandlerRouterInstance.getAddress(),
-        await routerInstance.getAddress(),
       );
     await percentageFeeHandlerInstance.changeFeeBounds(resourceID, 25, 50);
     await percentageFeeHandlerInstance.changeFeeBounds(
@@ -185,7 +179,6 @@ describe("PercentageFeeHandler - [change fee and bounds]", () => {
       await PercentageFeeHandlerContract.deploy(
         await bridgeInstance.getAddress(),
         await feeHandlerRouterInstance.getAddress(),
-        await routerInstance.getAddress(),
       );
     await percentageFeeHandlerInstance.changeFeeBounds(resourceID, 25, 50);
     await percentageFeeHandlerInstance.changeFeeBounds(
@@ -204,7 +197,6 @@ describe("PercentageFeeHandler - [change fee and bounds]", () => {
       await PercentageFeeHandlerContract.deploy(
         await bridgeInstance.getAddress(),
         await feeHandlerRouterInstance.getAddress(),
-        await routerInstance.getAddress(),
       );
     await expect(
       percentageFeeHandlerInstance

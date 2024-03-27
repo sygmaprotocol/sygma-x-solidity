@@ -67,14 +67,13 @@ describe("BasicFeeHandler - [distributeFee]", () => {
     const FeeHandlerRouterContract =
       await ethers.getContractFactory("FeeHandlerRouter");
     feeHandlerRouterInstance = await FeeHandlerRouterContract.deploy(
-      await routerInstance.getAddress(),
+      await bridgeInstance.getAddress(),
     );
     const BasicFeeHandlerContract =
       await ethers.getContractFactory("BasicFeeHandler");
     basicFeeHandlerInstance = await BasicFeeHandlerContract.deploy(
       await bridgeInstance.getAddress(),
       await feeHandlerRouterInstance.getAddress(),
-      await routerInstance.getAddress(),
     );
 
     resourceID = createResourceID(

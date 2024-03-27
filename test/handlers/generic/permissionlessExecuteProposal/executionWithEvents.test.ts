@@ -76,7 +76,6 @@ describe("PermissionlessGenericHandler - [Execute Proposal] - TestStore", () => 
     permissionlessGenericHandlerInstance =
       await PermissionlessGenericHandlerContract.deploy(
         await bridgeInstance.getAddress(),
-        await executorInstance.getAddress(),
       );
 
     [testStoreInstance] = await deployMockTestContracts(

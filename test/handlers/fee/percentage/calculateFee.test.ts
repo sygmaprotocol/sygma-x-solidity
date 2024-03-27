@@ -6,7 +6,6 @@ import { ethers } from "hardhat";
 
 import type {
   Bridge,
-  Router,
   ERC20Handler,
   ERC20PresetMinterPauser,
   FeeHandlerRouter,
@@ -27,7 +26,6 @@ describe("PercentageFeeHandler - [calculateFee]", () => {
   const securityModel = 1;
 
   let bridgeInstance: Bridge;
-  let routerInstance: Router;
   let percentageFeeHandlerInstance: PercentageERC20FeeHandlerEVM;
   let ERC20MintableInstance: ERC20PresetMinterPauser;
   let ERC20HandlerInstance: ERC20Handler;
@@ -40,7 +38,7 @@ describe("PercentageFeeHandler - [calculateFee]", () => {
   beforeEach(async () => {
     [, recipientAccount, relayer] = await ethers.getSigners();
 
-    [bridgeInstance, routerInstance] = await deployBridgeContracts(
+    [bridgeInstance] = await deployBridgeContracts(
       originDomainID,
       routerAddress,
     );
@@ -64,7 +62,6 @@ describe("PercentageFeeHandler - [calculateFee]", () => {
       await PercentageERC20FeeHandlerEVMContract.deploy(
         await bridgeInstance.getAddress(),
         await feeHandlerRouterInstance.getAddress(),
-        await routerInstance.getAddress(),
       );
 
     resourceID = createResourceID(

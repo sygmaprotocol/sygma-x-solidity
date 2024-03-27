@@ -2,11 +2,16 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 
 import type { HardhatEthersSigner } from "@nomicfoundation/hardhat-ethers/signers";
+import {
+  impersonateAccount,
+  setBalance,
+} from "@nomicfoundation/hardhat-network-helpers";
 import { assert, expect } from "chai";
 import { ethers } from "hardhat";
 
 import type {
   BasicFeeHandler,
+  Bridge,
   ERC20PresetMinterPauser,
   FeeHandlerRouter,
   Router,
@@ -24,6 +29,7 @@ describe("FeeHandlerRouter", () => {
   const routerAddress = "0x1a60efB48c61A79515B170CA61C84DD6dCA80418";
   const securityModel = 1;
 
+  let bridgeInstance: Bridge;
   let routerInstance: Router;
   let ERC20MintableInstance: ERC20PresetMinterPauser;
   let feeHandlerRouterInstance: FeeHandlerRouter;
@@ -33,7 +39,6 @@ describe("FeeHandlerRouter", () => {
   let whitelistedAccount: HardhatEthersSigner;
   let nonWhitelistedAccount: HardhatEthersSigner;
   let recipientAccount: HardhatEthersSigner;
-  let bridgeInstance: HardhatEthersSigner;
 
   let resourceID: string;
 
@@ -45,10 +50,9 @@ describe("FeeHandlerRouter", () => {
       nonAdminAccount,
       whitelistedAccount,
       nonWhitelistedAccount,
-      bridgeInstance,
     ] = await ethers.getSigners();
 
-    [, routerInstance] = await deployBridgeContracts(
+    [bridgeInstance, routerInstance] = await deployBridgeContracts(
       originDomainID,
       routerAddress,
     );
@@ -67,7 +71,6 @@ describe("FeeHandlerRouter", () => {
     basicFeeHandlerInstance = await BasicFeeHandlerContract.deploy(
       await bridgeInstance.getAddress(),
       await feeHandlerRouterInstance.getAddress(),
-      await routerInstance.getAddress(),
     );
     resourceID = createResourceID(
       await ERC20MintableInstance.getAddress(),
@@ -189,6 +192,13 @@ describe("FeeHandlerRouter", () => {
   });
 
   it("should revert if whitelisted address provides fee", async () => {
+    // this is used to impersonate a call from Router contract
+    // because ethersjs requires a signer to be passed into connect function
+    const routerInstanceAddress = await routerInstance.getAddress();
+    const routerContractSigner = await ethers.getSigner(routerInstanceAddress);
+    await setBalance(routerInstanceAddress, 10n ** 18n);
+    await impersonateAccount(routerInstanceAddress);
+
     await feeHandlerRouterInstance.adminSetWhitelist(
       await whitelistedAccount.getAddress(),
       true,
@@ -213,7 +223,7 @@ describe("FeeHandlerRouter", () => {
     );
     await expect(
       feeHandlerRouterInstance
-        .connect(bridgeInstance)
+        .connect(routerContractSigner)
         .collectFee(
           await whitelistedAccount.getAddress(),
           originDomainID,
@@ -233,7 +243,7 @@ describe("FeeHandlerRouter", () => {
 
     await expect(
       feeHandlerRouterInstance
-        .connect(bridgeInstance)
+        .connect(routerContractSigner)
         .collectFee(
           nonWhitelistedAccount.getAddress(),
           originDomainID,
@@ -250,6 +260,13 @@ describe("FeeHandlerRouter", () => {
   });
 
   it("should not collect fee from whitelisted address", async () => {
+    // this is used to impersonate a call from Router contract
+    // because ethersjs requires a signer to be passed into connect function
+    const routerInstanceAddress = await routerInstance.getAddress();
+    const routerContractSigner = await ethers.getSigner(routerInstanceAddress);
+    await setBalance(routerInstanceAddress, 10n ** 18n);
+    await impersonateAccount(routerInstanceAddress);
+
     await feeHandlerRouterInstance.adminSetWhitelist(
       await whitelistedAccount.getAddress(),
       true,
@@ -274,7 +291,7 @@ describe("FeeHandlerRouter", () => {
     );
     await expect(
       feeHandlerRouterInstance
-        .connect(bridgeInstance)
+        .connect(routerContractSigner)
         .collectFee(
           await whitelistedAccount.getAddress(),
           originDomainID,
@@ -284,7 +301,6 @@ describe("FeeHandlerRouter", () => {
           depositData,
           feeData,
           {
-            from: await bridgeInstance.getAddress(),
             value: "0",
           },
         ),

@@ -59,14 +59,13 @@ describe("BasicFeeHandler - [collectFee]", () => {
     const FeeHandlerRouterContract =
       await ethers.getContractFactory("FeeHandlerRouter");
     feeHandlerRouterInstance = await FeeHandlerRouterContract.deploy(
-      await routerInstance.getAddress(),
+      await bridgeInstance.getAddress(),
     );
     const BasicFeeHandlerContract =
       await ethers.getContractFactory("BasicFeeHandler");
     basicFeeHandlerInstance = await BasicFeeHandlerContract.deploy(
       await bridgeInstance.getAddress(),
       await feeHandlerRouterInstance.getAddress(),
-      await routerInstance.getAddress(),
     );
     erc20ResourceID = createResourceID(
       await ERC20MintableInstance.getAddress(),

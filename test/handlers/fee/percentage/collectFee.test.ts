@@ -65,7 +65,7 @@ describe("PercentageFeeHandler - [collectFee]", () => {
     const FeeHandlerRouterContract =
       await ethers.getContractFactory("FeeHandlerRouter");
     feeHandlerRouterInstance = await FeeHandlerRouterContract.deploy(
-      await routerInstance.getAddress(),
+      await bridgeInstance.getAddress(),
     );
     const PercentageERC20FeeHandlerEVMContract =
       await ethers.getContractFactory("PercentageERC20FeeHandlerEVM");
@@ -73,7 +73,6 @@ describe("PercentageFeeHandler - [collectFee]", () => {
       await PercentageERC20FeeHandlerEVMContract.deploy(
         await bridgeInstance.getAddress(),
         await feeHandlerRouterInstance.getAddress(),
-        await routerInstance.getAddress(),
       );
 
     resourceID = createResourceID(

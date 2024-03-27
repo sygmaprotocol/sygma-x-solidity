@@ -34,14 +34,13 @@ contract PercentageERC20FeeHandlerEVM is BasicFeeHandler, ERC20Safe {
     error NewBoundsEqualCurrentBounds(uint128 currentLowerBound, uint128 currentUpperBound);
 
     /**
-        @param bridgeAddress Contract address of previously deployed Bridge.
+        @param bridge Contract address of previously deployed Bridge.
         @param feeHandlerRouterAddress Contract address of previously deployed FeeHandlerRouter.
      */
     constructor(
-        address bridgeAddress,
-        address feeHandlerRouterAddress,
-        address routerAddress
-    ) BasicFeeHandler(bridgeAddress, feeHandlerRouterAddress, routerAddress) {}
+        IBridge bridge,
+        address feeHandlerRouterAddress
+    ) BasicFeeHandler(bridge, feeHandlerRouterAddress) {}
 
     // Admin functions
 
@@ -86,7 +85,7 @@ contract PercentageERC20FeeHandlerEVM is BasicFeeHandler, ERC20Safe {
         bytes calldata depositData,
         bytes calldata feeData
     ) internal view returns (uint256 fee, address tokenAddress) {
-        address tokenHandler = IBridge(_bridgeAddress)._resourceIDToHandlerAddress(resourceID);
+        address tokenHandler = _bridge._resourceIDToHandlerAddress(resourceID);
         tokenAddress = IERCHandler(tokenHandler)._resourceIDToTokenContractAddress(resourceID);
         Bounds memory bounds = _resourceIDToFeeBounds[resourceID];
 
@@ -182,7 +181,7 @@ contract PercentageERC20FeeHandlerEVM is BasicFeeHandler, ERC20Safe {
             addrs.length,
             amounts.length
         );
-        address tokenHandler = IBridge(_bridgeAddress)._resourceIDToHandlerAddress(resourceID);
+        address tokenHandler = _bridge._resourceIDToHandlerAddress(resourceID);
         address tokenAddress = IERCHandler(tokenHandler)._resourceIDToTokenContractAddress(resourceID);
         for (uint256 i = 0; i < addrs.length; i++) {
             releaseERC20(tokenAddress, addrs[i], amounts[i]);

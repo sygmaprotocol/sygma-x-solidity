@@ -8,7 +8,6 @@ import { ethers } from "hardhat";
 import type {
   Bridge,
   Router,
-  Executor,
   PermissionlessGenericHandler,
   TestStore,
 } from "../../../typechain-types";
@@ -32,7 +31,6 @@ describe("PermissionlessGenericHandler - [deposit]", () => {
 
   let bridgeInstance: Bridge;
   let routerInstance: Router;
-  let executorInstance: Executor;
   let permissionlessGenericHandlerInstance: PermissionlessGenericHandler;
   let testStoreInstance: TestStore;
   let depositorAccount: HardhatEthersSigner;
@@ -45,14 +43,15 @@ describe("PermissionlessGenericHandler - [deposit]", () => {
   beforeEach(async () => {
     [, depositorAccount, invalidDepositorAccount] = await ethers.getSigners();
 
-    [bridgeInstance, routerInstance, executorInstance] =
-      await deployBridgeContracts(originDomainID, routerAddress);
+    [bridgeInstance, routerInstance] = await deployBridgeContracts(
+      originDomainID,
+      routerAddress,
+    );
     const PermissionlessGenericHandlerContract =
       await ethers.getContractFactory("PermissionlessGenericHandler");
     permissionlessGenericHandlerInstance =
       await PermissionlessGenericHandlerContract.deploy(
         await bridgeInstance.getAddress(),
-        await executorInstance.getAddress(),
       );
     const TestStoreContract = await ethers.getContractFactory("TestStore");
     testStoreInstance = await TestStoreContract.deploy();

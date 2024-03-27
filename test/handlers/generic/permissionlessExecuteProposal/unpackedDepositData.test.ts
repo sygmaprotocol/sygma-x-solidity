@@ -69,7 +69,6 @@ describe("PermissionlessGenericHandler - [Execute Proposal] - Unpacked deposit d
     permissionlessGenericHandlerInstance =
       await PermissionlessGenericHandlerContract.deploy(
         await bridgeInstance.getAddress(),
-        await executorInstance.getAddress(),
       );
 
     [testStoreInstance, testDepositInstance] = await deployMockTestContracts(

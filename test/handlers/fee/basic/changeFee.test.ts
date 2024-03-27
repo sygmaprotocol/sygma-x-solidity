@@ -8,7 +8,6 @@ import { ethers } from "hardhat";
 import type {
   BasicFeeHandler,
   Bridge,
-  Router,
   FeeHandlerRouter,
   ERC20PresetMinterPauser,
 } from "../../../../typechain-types";
@@ -21,7 +20,6 @@ describe("BasicFeeHandler - [changeFee]", () => {
   const securityModel = 1;
 
   let bridgeInstance: Bridge;
-  let routerInstance: Router;
   let basicFeeHandlerInstance: BasicFeeHandler;
   let originERC20MintableInstance: ERC20PresetMinterPauser;
   let feeHandlerRouterInstance: FeeHandlerRouter;
@@ -32,7 +30,7 @@ describe("BasicFeeHandler - [changeFee]", () => {
   beforeEach(async () => {
     [, nonAdminAccount] = await ethers.getSigners();
 
-    [bridgeInstance, routerInstance] = await deployBridgeContracts(
+    [bridgeInstance] = await deployBridgeContracts(
       originDomainID,
       routerAddress,
     );
@@ -46,7 +44,6 @@ describe("BasicFeeHandler - [changeFee]", () => {
     basicFeeHandlerInstance = await BasicFeeHandlerContract.deploy(
       await bridgeInstance.getAddress(),
       await feeHandlerRouterInstance.getAddress(),
-      await routerInstance.getAddress(),
     );
     const ERC20PresetMinterPauserContract = await ethers.getContractFactory(
       "ERC20PresetMinterPauser",
