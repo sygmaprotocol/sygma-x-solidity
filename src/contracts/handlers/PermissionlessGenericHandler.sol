@@ -3,6 +3,7 @@
 
 pragma solidity 0.8.11;
 import "../interfaces/IHandler.sol";
+import "../interfaces/IBridge.sol";
 
 /**
     @title Handles generic deposits and deposit executions.
@@ -12,8 +13,7 @@ import "../interfaces/IHandler.sol";
 contract PermissionlessGenericHandler is IHandler {
     uint256 public constant MAX_FEE = 1000000;
 
-    address public immutable _bridgeAddress;
-    address public immutable _executorAddress;
+    IBridge public immutable _bridge;
 
     modifier onlyBridge() {
         _onlyBridge();
@@ -27,7 +27,7 @@ contract PermissionlessGenericHandler is IHandler {
     error InvalidExecutioDataDepositor(address executioDataDepositor);
 
     function _onlyBridge() private view {
-        if (msg.sender != _bridgeAddress) revert SenderNotBridgeContract();
+        if (msg.sender != address(_bridge)) revert SenderNotBridgeContract();
     }
 
     modifier onlyExecutor() {
@@ -35,17 +35,15 @@ contract PermissionlessGenericHandler is IHandler {
         _;
     }
 
-    function _onlyExecutor() private view {
-        if (msg.sender != _executorAddress) revert SenderNotExecutorContract();
+    function _onlyExecutor() private {
+        if (msg.sender != _bridge._executorAddress()) revert SenderNotExecutorContract();
     }
 
     /**
-        @param bridgeAddress Contract address of previously deployed Bridge.
-        @param executorAddress Contract address of previously deployed Executor.
+        @param bridge Contract address of previously deployed Bridge.
      */
-    constructor(address bridgeAddress, address executorAddress) {
-        _bridgeAddress = bridgeAddress;
-        _executorAddress = executorAddress;
+    constructor(IBridge bridge) {
+        _bridge = bridge;
     }
 
     /**

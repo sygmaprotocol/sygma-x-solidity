@@ -7,8 +7,6 @@ import { ethers } from "hardhat";
 
 import type {
   Bridge,
-  Router,
-  Executor,
   ERC20Handler,
   ERC20Handler__factory,
   ERC20PresetMinterPauser,
@@ -28,8 +26,6 @@ describe("ERC20Handler - [constructor]", function () {
   let resourceID: string;
 
   let bridgeInstance: Bridge;
-  let routerInstance: Router;
-  let executorInstance: Executor;
   let ERC20HandlerContract: ERC20Handler__factory;
   let ERC20MintableInstance: ERC20PresetMinterPauser;
   let ERC20HandlerInstance: ERC20Handler;
@@ -38,8 +34,7 @@ describe("ERC20Handler - [constructor]", function () {
 
   beforeEach(async () => {
     [, depositorAccount, recipientAccount] = await ethers.getSigners();
-    [bridgeInstance, routerInstance, executorInstance] =
-      await deployBridgeContracts(domainID, routerAddress);
+    [bridgeInstance] = await deployBridgeContracts(domainID, routerAddress);
 
     const ERC20MintableContract = await ethers.getContractFactory(
       "ERC20PresetMinterPauser",
@@ -48,8 +43,6 @@ describe("ERC20Handler - [constructor]", function () {
     ERC20HandlerContract = await ethers.getContractFactory("ERC20Handler");
     ERC20HandlerInstance = await ERC20HandlerContract.deploy(
       await bridgeInstance.getAddress(),
-      await routerInstance.getAddress(),
-      await executorInstance.getAddress(),
     );
 
     resourceID = createResourceID(

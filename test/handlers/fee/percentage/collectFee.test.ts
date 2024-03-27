@@ -7,12 +7,11 @@ import { ethers } from "hardhat";
 
 import type {
   Bridge,
+  Router,
   ERC20Handler,
   ERC20PresetMinterPauser,
-  Executor,
   FeeHandlerRouter,
   PercentageERC20FeeHandlerEVM,
-  Router,
 } from "../../../../typechain-types";
 import {
   deployBridgeContracts,
@@ -37,7 +36,6 @@ describe("PercentageFeeHandler - [collectFee]", () => {
 
   let bridgeInstance: Bridge;
   let routerInstance: Router;
-  let executorInstance: Executor;
   let ERC20MintableInstance: ERC20PresetMinterPauser;
   let ERC20HandlerInstance: ERC20Handler;
   let feeHandlerRouterInstance: FeeHandlerRouter;
@@ -51,14 +49,14 @@ describe("PercentageFeeHandler - [collectFee]", () => {
   beforeEach(async () => {
     [, depositorAccount, recipientAccount] = await ethers.getSigners();
 
-    [bridgeInstance, routerInstance, executorInstance] =
-      await deployBridgeContracts(originDomainID, routerAddress);
+    [bridgeInstance, routerInstance] = await deployBridgeContracts(
+      originDomainID,
+      routerAddress,
+    );
     const ERC20HandlerContract =
       await ethers.getContractFactory("ERC20Handler");
     ERC20HandlerInstance = await ERC20HandlerContract.deploy(
       await bridgeInstance.getAddress(),
-      await routerInstance.getAddress(),
-      await executorInstance.getAddress(),
     );
     const ERC20MintableContract = await ethers.getContractFactory(
       "ERC20PresetMinterPauser",
@@ -67,7 +65,7 @@ describe("PercentageFeeHandler - [collectFee]", () => {
     const FeeHandlerRouterContract =
       await ethers.getContractFactory("FeeHandlerRouter");
     feeHandlerRouterInstance = await FeeHandlerRouterContract.deploy(
-      await routerInstance.getAddress(),
+      await bridgeInstance.getAddress(),
     );
     const PercentageERC20FeeHandlerEVMContract =
       await ethers.getContractFactory("PercentageERC20FeeHandlerEVM");
@@ -75,7 +73,6 @@ describe("PercentageFeeHandler - [collectFee]", () => {
       await PercentageERC20FeeHandlerEVMContract.deploy(
         await bridgeInstance.getAddress(),
         await feeHandlerRouterInstance.getAddress(),
-        await routerInstance.getAddress(),
       );
 
     resourceID = createResourceID(

@@ -9,11 +9,7 @@ describe("BasicFeeHandler - [constructor]", () => {
     const BasicFeeHandlerContract =
       await ethers.getContractFactory("BasicFeeHandler");
     await expect(
-      BasicFeeHandlerContract.deploy(
-        ethers.ZeroAddress,
-        ethers.ZeroAddress,
-        ethers.ZeroAddress,
-      ),
+      BasicFeeHandlerContract.deploy(ethers.ZeroAddress, ethers.ZeroAddress),
     ).to.be.revertedWithCustomError(
       BasicFeeHandlerContract,
       "ZeroAddressProvided",

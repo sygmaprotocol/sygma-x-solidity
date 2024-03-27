@@ -10,7 +10,6 @@ import type {
   ERC20PresetMinterPauser,
   FeeHandlerRouter,
   PercentageERC20FeeHandlerEVM,
-  Router,
 } from "../../../../typechain-types";
 import { deployBridgeContracts, createResourceID } from "../../../helpers";
 
@@ -21,7 +20,6 @@ describe("PercentageFeeHandler - [admin]", () => {
   const securityModel = 1;
 
   let bridgeInstance: Bridge;
-  let routerInstance: Router;
   let percentageFeeHandlerInstance: PercentageERC20FeeHandlerEVM;
   let ERC20MintableInstance: ERC20PresetMinterPauser;
   let feeHandlerRouterInstance: FeeHandlerRouter;
@@ -36,7 +34,7 @@ describe("PercentageFeeHandler - [admin]", () => {
     [currentFeeHandlerAdmin, newPercentageFeeHandlerAdmin, nonAdminAccount] =
       await ethers.getSigners();
 
-    [bridgeInstance, routerInstance] = await deployBridgeContracts(
+    [bridgeInstance] = await deployBridgeContracts(
       originDomainID,
       routerAddress,
     );
@@ -55,7 +53,6 @@ describe("PercentageFeeHandler - [admin]", () => {
       await PercentageERC20FeeHandlerEVMContract.deploy(
         await bridgeInstance.getAddress(),
         await feeHandlerRouterInstance.getAddress(),
-        await routerInstance.getAddress(),
       );
 
     ADMIN_ROLE = await percentageFeeHandlerInstance.DEFAULT_ADMIN_ROLE();

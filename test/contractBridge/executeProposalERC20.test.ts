@@ -75,8 +75,6 @@ describe("Bridge - [execute proposal - ERC20]", () => {
       await ethers.getContractFactory("ERC20Handler");
     ERC20HandlerInstance = await ERC20HandlerContract.deploy(
       await bridgeInstance.getAddress(),
-      await routerInstance.getAddress(),
-      await executorInstance.getAddress(),
     );
 
     resourceID =

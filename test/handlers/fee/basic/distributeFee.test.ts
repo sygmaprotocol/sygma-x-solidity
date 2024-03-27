@@ -9,7 +9,6 @@ import type {
   BasicFeeHandler,
   Bridge,
   Router,
-  Executor,
   ERC20Handler,
   ERC20PresetMinterPauser,
   FeeHandlerRouter,
@@ -34,7 +33,6 @@ describe("BasicFeeHandler - [distributeFee]", () => {
   let depositData: string;
   let bridgeInstance: Bridge;
   let routerInstance: Router;
-  let executorInstance: Executor;
   let basicFeeHandlerInstance: BasicFeeHandler;
   let ERC20HandlerInstance: ERC20Handler;
   let ERC20MintableInstance: ERC20PresetMinterPauser;
@@ -53,8 +51,10 @@ describe("BasicFeeHandler - [distributeFee]", () => {
       nonAdminAccount,
     ] = await ethers.getSigners();
 
-    [bridgeInstance, routerInstance, executorInstance] =
-      await deployBridgeContracts(originDomainID, routerAddress);
+    [bridgeInstance, routerInstance] = await deployBridgeContracts(
+      originDomainID,
+      routerAddress,
+    );
     const ERC20MintableContract = await ethers.getContractFactory(
       "ERC20PresetMinterPauser",
     );
@@ -63,20 +63,17 @@ describe("BasicFeeHandler - [distributeFee]", () => {
       await ethers.getContractFactory("ERC20Handler");
     ERC20HandlerInstance = await ERC20HandlerContract.deploy(
       await bridgeInstance.getAddress(),
-      await routerInstance.getAddress(),
-      await executorInstance.getAddress(),
     );
     const FeeHandlerRouterContract =
       await ethers.getContractFactory("FeeHandlerRouter");
     feeHandlerRouterInstance = await FeeHandlerRouterContract.deploy(
-      await routerInstance.getAddress(),
+      await bridgeInstance.getAddress(),
     );
     const BasicFeeHandlerContract =
       await ethers.getContractFactory("BasicFeeHandler");
     basicFeeHandlerInstance = await BasicFeeHandlerContract.deploy(
       await bridgeInstance.getAddress(),
       await feeHandlerRouterInstance.getAddress(),
-      await routerInstance.getAddress(),
     );
 
     resourceID = createResourceID(

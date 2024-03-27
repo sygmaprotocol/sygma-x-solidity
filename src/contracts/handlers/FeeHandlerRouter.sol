@@ -3,6 +3,7 @@
 pragma solidity 0.8.11;
 
 import "../interfaces/IFeeHandler.sol";
+import "../interfaces/IBridge.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
 /**
@@ -11,7 +12,7 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
     @notice This contract is intended to be used with the Bridge contract.
  */
 contract FeeHandlerRouter is IFeeHandler, AccessControl {
-    address public immutable _routerAddress;
+    IBridge public immutable _bridge;
 
     // domainID => resourceID => securityModel => feeHandlerAddress
     mapping(uint8 => mapping(bytes32 => mapping(uint8 => IFeeHandler))) public
@@ -32,8 +33,8 @@ contract FeeHandlerRouter is IFeeHandler, AccessControl {
         _;
     }
 
-    function _onlyRouter() private view {
-        if (msg.sender != _routerAddress) revert SenderNotRouterContract();
+    function _onlyRouter() private {
+        if (msg.sender != _bridge._routerAddress()) revert SenderNotRouterContract();
     }
 
     modifier onlyAdmin() {
@@ -46,10 +47,10 @@ contract FeeHandlerRouter is IFeeHandler, AccessControl {
     }
 
     /**
-        @param routerAddress Contract address of previously deployed Router.
+        @param bridge Contract address of previously deployed Bridge.
      */
-    constructor(address routerAddress) {
-        _routerAddress = routerAddress;
+    constructor(IBridge bridge) {
+        _bridge = bridge;
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 

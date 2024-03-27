@@ -13,17 +13,40 @@ import "../ERC20Safe.sol";
  */
 contract ERC20Handler is IHandler, ERCHandlerHelpers, ERC20Safe {
     /**
-        @param bridgeAddress Contract address of previously deployed Bridge.
+        @param bridge Contract address of previously deployed Bridge.
      */
     constructor(
-        address bridgeAddress,
-        address routerAddress,
-        address executorAddress
+        IBridge bridge
     ) ERCHandlerHelpers(
-        bridgeAddress,
-        routerAddress,
-        executorAddress
+        bridge
     ) {}
+
+    modifier onlyBridge() {
+        _onlyBridge();
+        _;
+    }
+
+    modifier onlyRouter() {
+        _onlyRouter();
+        _;
+    }
+
+    modifier onlyExecutor() {
+        _onlyExecutor();
+        _;
+    }
+
+    function _onlyBridge() private {
+        if (msg.sender != address(_bridge)) revert SenderNotBridgeContract();
+    }
+
+    function _onlyExecutor() private {
+        if (msg.sender != _bridge._executorAddress()) revert SenderNotExecutorContract();
+    }
+
+    function _onlyRouter() private {
+        if (msg.sender != _bridge._routerAddress()) revert SenderNotRouterContract();
+    }
 
     /**
         @notice A deposit is initiated by making a deposit in the Bridge contract.
@@ -114,7 +137,7 @@ contract ERC20Handler is IHandler, ERCHandlerHelpers, ERC20Safe {
         recipient                              address     bytes  32 - 64
         amount                                 uint256     bytes  64 - 96
      */
-    function withdraw(bytes memory data) external override onlyBridge {
+    function withdraw(bytes memory data) external onlyBridge {
         address tokenAddress;
         address recipient;
         uint256 amount;
@@ -141,5 +164,14 @@ contract ERC20Handler is IHandler, ERCHandlerHelpers, ERC20Safe {
             uint8 externalTokenDecimals = uint8(bytes1(args));
             _setDecimals(contractAddress, externalTokenDecimals);
         }
+    }
+
+    /**
+        @notice First verifies {contractAddress} is whitelisted, then sets
+        {_tokenContractAddressToTokenProperties[contractAddress].isBurnable} to true.
+        @param contractAddress Address of contract to be used when making or executing deposits.
+     */
+    function setBurnable(address contractAddress) external onlyBridge {
+        _setBurnable(contractAddress);
     }
 }

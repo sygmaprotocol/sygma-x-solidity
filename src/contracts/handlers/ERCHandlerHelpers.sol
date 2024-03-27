@@ -3,16 +3,16 @@
 pragma solidity 0.8.11;
 
 import "../interfaces/IERCHandler.sol";
+import "../interfaces/IBridge.sol";
+
 
 /**
     @title Function used across handler contracts.
     @author ChainSafe Systems.
     @notice This contract is intended to be used with the Bridge contract.
  */
-abstract contract ERCHandlerHelpers is IERCHandler {
-    address public immutable _bridgeAddress;
-    address public immutable _routerAddress;
-    address public immutable _executorAddress;
+contract ERCHandlerHelpers {
+    IBridge public _bridge;
 
     uint8 public constant DEFAULT_DECIMALS = 18;
 
@@ -40,52 +40,11 @@ abstract contract ERCHandlerHelpers is IERCHandler {
     // token contract address => ERCTokenContractProperties
     mapping(address => ERCTokenContractProperties) public _tokenContractAddressToTokenProperties;
 
-    modifier onlyBridge() {
-        _onlyBridge();
-        _;
-    }
-
-    modifier onlyRouter() {
-        _onlyRouter();
-        _;
-    }
-
-    modifier onlyExecutor() {
-        _onlyExecutor();
-        _;
-    }
-
-    function _onlyBridge() private view {
-        if (msg.sender != _bridgeAddress) revert SenderNotBridgeContract();
-    }
-
-    function _onlyExecutor() private view {
-        if (msg.sender != _executorAddress) revert SenderNotExecutorContract();
-    }
-
-    function _onlyRouter() private view {
-        if (msg.sender != _routerAddress) revert SenderNotRouterContract();
-    }
-
-
     /**
-        @param bridgeAddress Contract address of previously deployed Bridge.
-        @param routerAddress Contract address of previously deployed Router.
-        @param executorAddress Contract address of previously deployed Executor.
+        @param bridge Contract address of previously deployed Bridge.
      */
-    constructor(address bridgeAddress, address routerAddress, address executorAddress) {
-        _bridgeAddress = bridgeAddress;
-        _routerAddress = routerAddress;
-        _executorAddress = executorAddress;
-    }
-
-    /**
-        @notice First verifies {contractAddress} is whitelisted, then sets
-        {_tokenContractAddressToTokenProperties[contractAddress].isBurnable} to true.
-        @param contractAddress Address of contract to be used when making or executing deposits.
-     */
-    function setBurnable(address contractAddress) external override onlyBridge {
-        _setBurnable(contractAddress);
+    constructor(IBridge bridge) {
+        _bridge = bridge;
     }
 
     function _setResource(bytes32 resourceID, address contractAddress) internal {

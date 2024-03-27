@@ -6,8 +6,6 @@ import { ethers } from "hardhat";
 
 import type {
   Bridge,
-  Router,
-  Executor,
   ERC20Handler,
   ERC20PresetMinterPauser,
 } from "../../../typechain-types";
@@ -19,8 +17,6 @@ describe("ERC20Handler - [Burn ERC20]", () => {
   const routerAddress = "0x1a60efB48c61A79515B170CA61C84DD6dCA80418";
 
   let bridgeInstance: Bridge;
-  let routerInstance: Router;
-  let executorInstance: Executor;
   let ERC20HandlerInstance: ERC20Handler;
   let ERC20MintableInstance1: ERC20PresetMinterPauser;
   let ERC20MintableInstance2: ERC20PresetMinterPauser;
@@ -32,8 +28,7 @@ describe("ERC20Handler - [Burn ERC20]", () => {
   let burnableContractAddresses: Array<string>;
 
   beforeEach(async () => {
-    [bridgeInstance, routerInstance, executorInstance] =
-      await deployBridgeContracts(domainID, routerAddress);
+    [bridgeInstance] = await deployBridgeContracts(domainID, routerAddress);
     const ERC20MintableContract = await ethers.getContractFactory(
       "ERC20PresetMinterPauser",
     );
@@ -43,8 +38,6 @@ describe("ERC20Handler - [Burn ERC20]", () => {
       await ethers.getContractFactory("ERC20Handler");
     ERC20HandlerInstance = await ERC20HandlerContract.deploy(
       await bridgeInstance.getAddress(),
-      await routerInstance.getAddress(),
-      await executorInstance.getAddress(),
     );
     resourceID1 = ethers.zeroPadValue(
       (await ERC20MintableInstance1.getAddress()) +
