@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.5.0](https://github.com/sygmaprotocol/sygma-x-solidity/compare/v2.4.2...v2.5.0) (2024-06-06)
+
+
+### Features
+
+* rearrange core contracts addresses ([#32](https://github.com/sygmaprotocol/sygma-x-solidity/issues/32)) ([11b9f67](https://github.com/sygmaprotocol/sygma-x-solidity/commit/11b9f67e969b72ae142e0f69cd2b673c1489e3c0))
+
+
+### Miscellaneous
+
+* pack slot index and router address into single mapping to save on gas ([#57](https://github.com/sygmaprotocol/sygma-x-solidity/issues/57)) ([ff80bd5](https://github.com/sygmaprotocol/sygma-x-solidity/commit/ff80bd5a1c1764250c16a338c34f80ca46148ffc))
+
 ## [2.4.2](https://github.com/sygmaprotocol/sygma-x-solidity/compare/v2.4.1...v2.4.2) (2024-03-25)
 
 
