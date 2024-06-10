@@ -1,6 +1,7 @@
 import type { HardhatRuntimeEnvironment } from "hardhat/types";
 import type { DeployFunction } from "hardhat-deploy/dist/types";
 
+import { DEPLOYMENTS } from "../types";
 import { verifyContract } from "../utils";
 
 const deployFunc: DeployFunction = async function ({
@@ -10,15 +11,9 @@ const deployFunc: DeployFunction = async function ({
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
   try {
-    const bridgeInstance = await deployments.get("Bridge");
-    const routerInstance = await deployments.get("Router");
-    const executorInstance = await deployments.get("Executor");
+    const bridgeInstance = await deployments.get(DEPLOYMENTS.Bridge);
 
-    const erc20HandlerArgs = [
-      bridgeInstance.address,
-      routerInstance.address,
-      executorInstance.address,
-    ];
+    const erc20HandlerArgs = [bridgeInstance.address];
     const erc20HandlerInstance = await deploy("ERC20Handler", {
       from: deployer,
       args: erc20HandlerArgs,
@@ -29,10 +24,7 @@ const deployFunc: DeployFunction = async function ({
       `ERC20 handler contract successfully deployed to: ${erc20HandlerInstance.address}`,
     );
 
-    const permissionlessGenericHandlerArgs = [
-      bridgeInstance.address,
-      executorInstance.address,
-    ];
+    const permissionlessGenericHandlerArgs = [bridgeInstance.address];
     const permissionlessGenericHandlerInstance = await deploy(
       "PermissionlessGenericHandler",
       {
@@ -49,7 +41,7 @@ const deployFunc: DeployFunction = async function ({
       `Permissionless generic handler contract successfully deployed to: ${permissionlessGenericHandlerInstance.address}`,
     );
 
-    const feeHandlerRouterArgs = [routerInstance.address];
+    const feeHandlerRouterArgs = [bridgeInstance.address];
     const feeHandlerRouterInstance = await deploy("FeeHandlerRouter", {
       from: deployer,
       args: feeHandlerRouterArgs,
@@ -63,7 +55,6 @@ const deployFunc: DeployFunction = async function ({
     const basicFeeHandlerArgs = [
       bridgeInstance.address,
       feeHandlerRouterInstance.address,
-      routerInstance.address,
     ];
     const basicFeeHandlerInstance = await deploy("BasicFeeHandler", {
       from: deployer,
@@ -78,7 +69,6 @@ const deployFunc: DeployFunction = async function ({
     const percentageFeeHandlerArgs = [
       bridgeInstance.address,
       feeHandlerRouterInstance.address,
-      routerInstance.address,
     ];
     const percentageFeeHandlerInstance = await deploy(
       "PercentageERC20FeeHandlerEVM",

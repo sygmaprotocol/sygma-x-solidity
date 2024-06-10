@@ -1,0 +1,88 @@
+{
+  "localhost": {
+    "domainID": "1",
+    "specterAddress": "0x455E5AA18469bC6ccEF49594645666C587A3a71B",
+    "routerAddress": "0x455E5AA18469bC6ccEF49594645666C587A3a71B",
+    "executorAddress": "0x455E5AA18469bC6ccEF49594645666C587A3a71B",
+    "verifiersAddresses": ["0x990D2FcF3AEe2D543aCf75CEc053eF16c0eAfAA1","0x990D2FcF3AEe2D543aCf75CEc053eF16c0eAfAA1"],
+    "securityModel": 1,
+    "slotIndex": 1,
+    "access": {
+      "feeRouterAdmin": "0xe9f23A8289764280697a03aC06795eA92a170e42",
+      "feeHandlerAdmin": "0xe9f23A8289764280697a03aC06795eA92a170e42",
+      "accessControl": {
+        "0x80ae1c28": "0xe9f23A8289764280697a03aC06795eA92a170e42",
+        "0xffaac0eb": "0xe9f23A8289764280697a03aC06795eA92a170e42",
+        "0x9d33b6d4": "0xe9f23A8289764280697a03aC06795eA92a170e42",
+        "0x8b63aebf": "0xe9f23A8289764280697a03aC06795eA92a170e42",
+        "0x8c0c2631": "0xe9f23A8289764280697a03aC06795eA92a170e42",
+        "0xedc20c3c": "0xe9f23A8289764280697a03aC06795eA92a170e42",
+        "0xd15ef64e": "0xe9f23A8289764280697a03aC06795eA92a170e42",
+        "0x8a3234c7": "0xe9f23A8289764280697a03aC06795eA92a170e42",
+        "0xbd2a1820": "0xe9f23A8289764280697a03aC06795eA92a170e42",
+        "0xd2e5fae9": "0xe9f23A8289764280697a03aC06795eA92a170e42",
+        "0xd8236744": "0xe9f23A8289764280697a03aC06795eA92a170e42",
+        "0x366b4885": "0xe9f23A8289764280697a03aC06795eA92a170e42",
+        "0x6ba6db6b": "0xe9f23A8289764280697a03aC06795eA92a170e42"
+      }
+    },
+    "erc20": [
+      {
+        "name": "ERC20LRTest",
+        "symbol": "ERC20TST",
+        "address": "0x455E5AA18469bC6ccEF49594645666C587A3a71B",
+        "resourceID": "0x0000000000000000000000000000000000000000000000000000000000000300",
+        "feeType": "undefined",
+        "strategy": "lr",
+        "decimals": "18"
+      }
+    ],
+    "permissionlessGeneric": {
+      "resourceID": "0x0000000000000000000000000000000000000000000000000000000000000500",
+      "feeType": "undefined"
+    }
+  },
+  "sepolia": {
+    "domainID": "2",
+    "specterAddress": "0x455E5AA18469bC6ccEF49594645666C587A3a71B",
+    "routerAddress": "0x455E5AA18469bC6ccEF49594645666C587A3a71B",
+    "executorAddress": "0x455E5AA18469bC6ccEF49594645666C587A3a71B",
+    "verifiersAddresses": ["0x990D2FcF3AEe2D543aCf75CEc053eF16c0eAfAA1","0x990D2FcF3AEe2D543aCf75CEc053eF16c0eAfAA1"],
+    "securityModel": 1,
+    "slotIndex": 1,
+    "access": {
+      "feeRouterAdmin": "0xe9f23A8289764280697a03aC06795eA92a170e42",
+      "feeHandlerAdmin": "0xe9f23A8289764280697a03aC06795eA92a170e42",
+      "accessControl": {
+        "0x80ae1c28": "0xe9f23A8289764280697a03aC06795eA92a170e42",
+        "0xffaac0eb": "0xe9f23A8289764280697a03aC06795eA92a170e42",
+        "0x9d33b6d4": "0xe9f23A8289764280697a03aC06795eA92a170e42",
+        "0x8b63aebf": "0xe9f23A8289764280697a03aC06795eA92a170e42",
+        "0x8c0c2631": "0xe9f23A8289764280697a03aC06795eA92a170e42",
+        "0xedc20c3c": "0xe9f23A8289764280697a03aC06795eA92a170e42",
+        "0xd15ef64e": "0xe9f23A8289764280697a03aC06795eA92a170e42",
+        "0x8a3234c7": "0xe9f23A8289764280697a03aC06795eA92a170e42",
+        "0xbd2a1820": "0xe9f23A8289764280697a03aC06795eA92a170e42",
+        "0xd2e5fae9": "0xe9f23A8289764280697a03aC06795eA92a170e42",
+        "0xd8236744": "0xe9f23A8289764280697a03aC06795eA92a170e42",
+        "0x366b4885": "0xe9f23A8289764280697a03aC06795eA92a170e42",
+        "0x6ba6db6b": "0xe9f23A8289764280697a03aC06795eA92a170e42"
+      }
+    },
+    "erc20": [
+      {
+        "name": "ERC20LRTest",
+        "symbol": "ERC20TST",
+        "address": "0x455E5AA18469bC6ccEF49594645666C587A3a71B",
+        "resourceID": "0x0000000000000000000000000000000000000000000000000000000000000300",
+        "feeType": "undefined",
+        "strategy": "lr",
+        "decimals": "18"
+      }
+    ],
+    "permissionlessGeneric": {
+      "resourceID": "0x0000000000000000000000000000000000000000000000000000000000000500",
+      "feeType": "undefined"
+    }
+  }
+}

@@ -31,6 +31,8 @@ Requires `yarn` and `@nomicfoundation/hardhat`.
     `test` - Runs mocha tests <br>
     `typechain` - Generate Typechain typings for compiled contracts <br>
     `verify` - Verifies contract on Etherscan <br>
+  * custom hardhat commands: <bt>
+    `configure-sygma --file [path to config json]` - configures sygma after deployments
   * custom commands: <br>
     `yarn run test`: Runs tests.
 

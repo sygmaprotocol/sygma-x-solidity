@@ -12,8 +12,6 @@ const deployFunc: DeployFunction = async function ({
   const { deployer } = await getNamedAccounts();
 
   const domainID = process.env.BRIDGE_DOMAIN_ID;
-  const reannounceAdminAddress =
-    process.env.FUNCTIONS_ACCESS_ADMIN_ADDRESS ?? deployer;
   const spectreDomainIDs = process.env.SPECTRE_DOMAIN_IDS ?? 0;
   const spectreAddresses = process.env.SPECTRE_ADDRESSES ?? ethers.ZeroAddress;
 
@@ -33,7 +31,7 @@ const deployFunc: DeployFunction = async function ({
 
     const accessControlArgs = [
       accessControlFuncSignatures,
-      Array(accessControlFuncSignatures.length).fill(reannounceAdminAddress),
+      Array(accessControlFuncSignatures.length).fill(deployer),
     ];
     const accessControlInstance = await deploy("AccessControlSegregator", {
       from: deployer,
@@ -43,9 +41,6 @@ const deployFunc: DeployFunction = async function ({
     await verifyContract(accessControlInstance, accessControlArgs);
     console.log(
       `Access control segregator contract successfully deployed to: ${accessControlInstance.address}`,
-    );
-    console.log(
-      `Granted all admin functions rights to: ${reannounceAdminAddress}`,
     );
 
     const specterProxyArgs = [spectreDomainIDs, spectreAddresses];

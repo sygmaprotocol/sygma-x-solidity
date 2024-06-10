@@ -6,6 +6,8 @@ import "@nomicfoundation/hardhat-chai-matchers";
 import "@nomicfoundation/hardhat-verify";
 import "hardhat-deploy";
 
+import "./scripts/tasks";
+
 dotenv.config();
 
 const config: HardhatUserConfig = {
@@ -20,6 +22,10 @@ const config: HardhatUserConfig = {
     },
   },
   networks: {
+    localhost: {
+      live: false,
+      saveDeployments: true,
+    },
     sepolia: {
       url: `${process.env.SEPOLIA_PROVIDER_URL}`,
       accounts: [
