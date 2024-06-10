@@ -23,14 +23,15 @@ contract Executor is Context {
     uint8 public immutable _domainID;
     IAccessControlSegregator public _accessControl;
 
-    // originDomainID => slot index number
-    mapping(uint8 => uint8) public _slotIndexes;
+    /*  origin domainID => metadata:
+            uint8 slotIndex
+            address routerAddress
+    */
+    mapping(uint8 => Metadata) public _originDomainIDMetadata;
     // securityModel => state root storage contract addresses
     mapping(uint8 => address[]) public _securityModels;
     // origin domainID => nonces set => used deposit nonces
     mapping(uint8 => mapping(uint256 => uint256)) public usedNonces;
-    //  origin domainID => router address
-    mapping(uint8 => address) public _originDomainIDToRouter;
 
     struct Proposal {
         uint8 originDomainID;
@@ -39,6 +40,11 @@ contract Executor is Context {
         bytes32 resourceID;
         bytes data;
         bytes[] storageProof;
+    }
+
+    struct Metadata {
+        uint8 slotIndex;
+        address routerAddress;
     }
 
     event ProposalExecution(uint8 originDomainID, uint64 depositNonce, bytes handlerResponse);
@@ -79,25 +85,25 @@ contract Executor is Context {
     }
 
     /**
-        @notice Maps the {originDomainID} to {router} in _originDomainIDToRouter.
+        @notice Maps the {originDomainID} to {router} in _originDomainIDMetadata.
         @notice Only callable by address that has the right to call the specific function,
         which is mapped in {functionAccess} in AccessControlSegregator contract.
         @param newRouter Address of router that will be updated to.
      */
     function adminChangeRouter(uint8 originDomainID, address newRouter) external onlyAllowed {
-        _originDomainIDToRouter[originDomainID] = newRouter;
+        _originDomainIDMetadata[originDomainID].routerAddress = newRouter;
         emit FeeRouterChanged(originDomainID, newRouter);
     }
 
     /**
-        @notice Maps the {originDomainID} to {slotIndex} in _slotIndexes.
+        @notice Maps the {originDomainID} to {slotIndex} in _originDomainIDMetadata.
         @notice Only callable by address that has the right to call the specific function,
         which is mapped in {functionAccess} in AccessControlSegregator contract.
         @param originDomainID domain from which the proposal originated.
         @param slotIndex Index number to be used for the belonging origin domain ID in slot key calculation.
      */
     function adminChangeSlotIndex(uint8 originDomainID, uint8 slotIndex) external onlyAllowed {
-        _slotIndexes[originDomainID] = slotIndex;
+        _originDomainIDMetadata[originDomainID].slotIndex = slotIndex;
     }
 
     /**
@@ -147,7 +153,7 @@ contract Executor is Context {
             }
             bytes32 expectedStateRoot;
             bytes32 storageRoot;
-            address routerAddress = _originDomainIDToRouter[proposal.originDomainID];
+            address routerAddress = _originDomainIDMetadata[proposal.originDomainID].routerAddress;
 
             IStateRootStorage checkingStateRootStorage = IStateRootStorage(
                 _securityModels[proposal.securityModel][0]
@@ -235,7 +241,9 @@ contract Executor is Context {
             )
         );
         bytes32 slotKey = keccak256(abi.encode(keccak256(
-            abi.encode(proposal.depositNonce, keccak256(abi.encode(_domainID, _slotIndexes[proposal.originDomainID])))
+            abi.encode(proposal.depositNonce, keccak256(
+                abi.encode(_domainID, _originDomainIDMetadata[proposal.originDomainID].slotIndex))
+            )
         )));
 
         bytes32 slotValue = StorageProof.getStorageValue(slotKey, storageRoot, proposal.storageProof);
